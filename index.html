@@ -324,6 +324,7 @@
       pointer-events: none;
       transition: opacity .25s;
     }
+    .product-image::before { opacity: var(--touch-shine, 0); }
     .product-card:hover .product-image::before { opacity: 1; }
     .product-card:hover .product-image img { transform: translateZ(15px) scale(1.04); }
     .product-image.image-unavailable::after { position: absolute; inset: 0; display: grid; place-items: center; color: #756b5b; background: linear-gradient(135deg, #f2e7d5, #e2d1bb); content: "Фото скоро появится"; font-size: 12px; }
@@ -656,15 +657,16 @@
     const imageUrl = filename => `assets/pizzas/${filename}`;
 
     const grid = document.querySelector("#product-grid");
-    const canUse3D = matchMedia("(hover: hover) and (pointer: fine)").matches
-      && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canUse3D = matchMedia("(hover: hover) and (pointer: fine)").matches && !reducedMotion;
+    const canUseTouch3D = matchMedia("(pointer: coarse)").matches && !reducedMotion;
 
-    function setTilt(element, x, y, prefix) {
+    function setTilt(element, x, y, prefix, maxTilt = 12) {
       const bounds = element.getBoundingClientRect();
       const normalizedX = Math.max(-0.5, Math.min(0.5, (x - bounds.left) / bounds.width - 0.5));
       const normalizedY = Math.max(-0.5, Math.min(0.5, (y - bounds.top) / bounds.height - 0.5));
-      element.style.setProperty(`--${prefix}-rotate-x`, `${(-normalizedY * 12).toFixed(2)}deg`);
-      element.style.setProperty(`--${prefix}-rotate-y`, `${(normalizedX * 12).toFixed(2)}deg`);
+      element.style.setProperty(`--${prefix}-rotate-x`, `${(-normalizedY * maxTilt).toFixed(2)}deg`);
+      element.style.setProperty(`--${prefix}-rotate-y`, `${(normalizedX * maxTilt).toFixed(2)}deg`);
       if (prefix === "card") {
         element.style.setProperty("--shine-x", `${((normalizedX + 0.5) * 100).toFixed(1)}%`);
         element.style.setProperty("--shine-y", `${((normalizedY + 0.5) * 100).toFixed(1)}%`);
@@ -755,6 +757,43 @@
             card.style.setProperty("--card-rotate-y", "0deg");
             card.style.setProperty("--shine-x", "50%");
             card.style.setProperty("--shine-y", "50%");
+          });
+        }
+        if (canUseTouch3D) {
+          let activeTouchPointer = null;
+          const productImage = card.querySelector(".product-image");
+          const productPhoto = productImage.querySelector("img");
+          const resetTouchTilt = () => {
+            activeTouchPointer = null;
+            card.classList.remove("is-touching");
+            card.style.removeProperty("will-change");
+            card.style.removeProperty("box-shadow");
+            card.style.setProperty("--card-rotate-x", "0deg");
+            card.style.setProperty("--card-rotate-y", "0deg");
+            card.style.setProperty("--shine-x", "50%");
+            card.style.setProperty("--shine-y", "50%");
+            card.style.removeProperty("--touch-shine");
+            productPhoto.style.removeProperty("transform");
+          };
+          card.addEventListener("pointerdown", event => {
+            if (event.pointerType !== "touch" || !event.isPrimary) return;
+            activeTouchPointer = event.pointerId;
+            card.classList.add("is-touching");
+            card.style.setProperty("will-change", "transform");
+            card.style.setProperty("box-shadow", "var(--shadow)");
+            card.style.setProperty("--touch-shine", "1");
+            productPhoto.style.setProperty("transform", "translateZ(15px) scale(1.04)");
+            setTilt(card, event.clientX, event.clientY, "card", 8);
+          });
+          card.addEventListener("pointermove", event => {
+            if (event.pointerType !== "touch" || event.pointerId !== activeTouchPointer) return;
+            setTilt(card, event.clientX, event.clientY, "card", 8);
+          });
+          card.addEventListener("pointerup", event => {
+            if (event.pointerId === activeTouchPointer) resetTouchTilt();
+          });
+          card.addEventListener("pointercancel", event => {
+            if (event.pointerId === activeTouchPointer) resetTouchTilt();
           });
         }
         const priceLabel = card.querySelector(".current-price");
