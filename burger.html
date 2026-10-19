@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171713">
+  <meta name="description" content="ЖАР — бургеры с огня, горячая картошка и соусы собственного приготовления.">
+  <title>ЖАР — бургеры с огня</title>
+  <style>
+    :root {
+      --ink: #171713;
+      --panel: #22221c;
+      --paper: #f5f0e7;
+      --muted: #a5a093;
+      --line: #39382f;
+      --acid: #d7f36a;
+      --orange: #ff7645;
+      --cream: #fff9ee;
+      --shadow: 0 24px 70px #05050470;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--cream);
+      background: var(--ink);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    html { overflow-x: clip; scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ink); }
+    body.locked { overflow: hidden; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--acid);
+      outline-offset: 3px;
+    }
+    .wrap { width: min(1180px, calc(100% - 48px)); margin-inline: auto; }
+    .announcement {
+      padding: 9px 16px;
+      color: #202018;
+      background: var(--acid);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .header {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      border-bottom: 1px solid #ffffff12;
+      background: #171713eF;
+      backdrop-filter: blur(16px);
+    }
+    .nav { min-height: 74px; display: flex; align-items: center; gap: 36px; }
+    .brand { display: inline-flex; flex-shrink: 0; align-items: center; gap: 10px; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid #ffffff35;
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--acid);
+      font-size: 21px;
+      font-weight: 900;
+      transform: rotate(-7deg);
+    }
+    .brand-name { font-size: 16px; font-weight: 900; letter-spacing: .12em; }
+    .brand-name span { color: var(--acid); }
+    .nav-links { display: flex; align-items: center; gap: 27px; color: #c2bdae; font-size: 12px; }
+    .nav-links a { transition: color .2s; }
+    .nav-links a:hover { color: var(--acid); }
+    .nav-right { display: flex; align-items: center; gap: 11px; margin-left: auto; }
+    .mobile-menu-button {
+      display: none;
+      padding: 9px 11px;
+      border: 1px solid #ffffff2b;
+      border-radius: 999px;
+      color: var(--cream);
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .cart-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      border: 1px solid #ffffff23;
+      border-radius: 999px;
+      color: var(--ink);
+      background: var(--acid);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      transition: transform .2s, background .2s;
+    }
+    .cart-trigger:hover { transform: translateY(-2px); background: #e3ff89; }
+    .cart-count {
+      display: grid;
+      width: 21px;
+      height: 21px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--cream);
+      background: var(--ink);
+      font-size: 10px;
+    }
+    .cart-count.bump { animation: count-bump .42s cubic-bezier(.2,.8,.3,1.4); }
+    @keyframes count-bump { 45% { transform: scale(1.4); background: var(--orange); } }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 54px 0 62px;
+      background:
+        radial-gradient(ellipse at 76% 46%, #6a371b50, transparent 34%),
+        radial-gradient(ellipse at 54% 112%, #d7f36a12, transparent 37%),
+        #171713;
+    }
+    .hero::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background-image: radial-gradient(#fff 0.65px, transparent 0.65px);
+      background-size: 28px 28px;
+      content: "";
+      opacity: .1;
+      mask-image: linear-gradient(90deg, transparent, #000 80%);
+    }
+    .hero-inner { display: grid; min-height: 500px; grid-template-columns: 1fr 1fr; align-items: center; gap: 24px; }
+    .hero-copy { position: relative; z-index: 2; max-width: 560px; }
+    .eyebrow { color: var(--acid); font-size: 11px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
+    .hero h1 {
+      margin: 16px 0;
+      font-size: clamp(54px, 7vw, 92px);
+      font-weight: 950;
+      letter-spacing: -.085em;
+      line-height: .86;
+      text-transform: uppercase;
+    }
+    .hero h1 span { display: block; color: var(--acid); }
+    .hero-copy > p { max-width: 390px; margin: 0 0 25px; color: #b8b1a2; font-size: 14px; line-height: 1.75; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; }
+    .primary-button {
+      display: inline-flex;
+      min-height: 49px;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      padding: 0 21px;
+      border: 0;
+      border-radius: 9px;
+      color: var(--ink);
+      background: var(--acid);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      transition: transform .2s, background .2s;
+    }
+    .primary-button:hover { transform: translateY(-3px); background: #e3ff89; }
+    .hero-note { display: flex; align-items: center; gap: 8px; color: #b8b1a2; font-size: 11px; }
+    .hero-note b { color: var(--orange); font-size: 16px; }
+    .hero-art {
+      position: relative;
+      display: grid;
+      min-height: 460px;
+      place-items: center;
+      perspective: 1200px;
+      perspective-origin: 50% 43%;
+      touch-action: pan-y;
+      --hero-rotate-x: 0deg;
+      --hero-rotate-y: 0deg;
+    }
+    .hero-art::before {
+      position: absolute;
+      width: min(37vw, 400px);
+      aspect-ratio: 1;
+      border: 1px solid #ffffff26;
+      border-radius: 50%;
+      box-shadow: 0 0 0 24px #ffffff06, 0 0 90px #ff764520;
+      content: "";
+      transform: rotateX(67deg) rotateZ(-18deg);
+    }
+    .hero-art::after {
+      position: absolute;
+      bottom: 13%;
+      width: min(35vw, 360px);
+      height: 58px;
+      border-radius: 50%;
+      background: #0009;
+      content: "";
+      filter: blur(22px);
+      transform: translateZ(-75px);
+    }
+    .burger-model {
+      position: relative;
+      z-index: 1;
+      width: min(36vw, 390px);
+      height: min(38vw, 420px);
+      min-height: 330px;
+      transform: rotateX(var(--hero-rotate-x)) rotateY(var(--hero-rotate-y));
+      transform-style: preserve-3d;
+      transition: transform .18s ease-out;
+      animation: burger-hover 5s ease-in-out infinite;
+      will-change: transform;
+    }
+    .hero-3d-canvas {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .hero-drag-target {
+      position: absolute;
+      z-index: 2;
+      top: 13%;
+      bottom: 19%;
+      left: 15%;
+      width: 70%;
+      border: 0;
+      border-radius: 48%;
+      background: transparent;
+      cursor: grab;
+      padding: 0;
+      touch-action: none;
+    }
+    .hero-drag-target:active { cursor: grabbing; }
+    .hero-drag-target:focus-visible { outline: 2px solid var(--acid); outline-offset: -4px; }
+    .hero-art.is-dragging { cursor: grabbing; }
+    .hero-rotate-hint {
+      position: absolute;
+      z-index: 3;
+      top: 5%;
+      left: 50%;
+      color: #c4bdaf;
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: .11em;
+      pointer-events: none;
+      text-align: center;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .hero-art.webgl-ready .burger-model { visibility: hidden; }
+    @keyframes burger-hover {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -10px; }
+    }
+    .burger-layer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(var(--layer-y)) translateZ(var(--layer-z, 0px)) rotateX(57deg) rotateZ(var(--layer-turn, 0deg));
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      transition: transform .72s cubic-bezier(.2,.8,.2,1);
+    }
+    .hero-art.exploded .burger-layer { transform: translate(-50%, -50%) translateY(calc(var(--layer-y) + var(--explode-y, 0px))) translateZ(var(--layer-z, 0px)) rotateX(57deg) rotateZ(var(--layer-turn, 0deg)); }
+    .bottom-bun {
+      z-index: 1;
+      width: 278px;
+      height: 100px;
+      border: 2px solid #f6ca76;
+      border-radius: 50% 50% 35% 35% / 54% 54% 34% 34%;
+      background: linear-gradient(180deg, #e6a747 0 34%, #bf712b 35% 68%, #a95623);
+      box-shadow: inset 0 11px 16px #ffdc8a80, 0 16px 0 #713a20, 0 23px 20px #12090475;
+      --layer-y: 104px;
+      --layer-z: 9px;
+      --explode-y: 100px;
+    }
+    .patty {
+      z-index: 2;
+      width: 300px;
+      height: 67px;
+      border: 5px solid #71371f;
+      border-radius: 48%;
+      background:
+        radial-gradient(ellipse at 25% 40%, #ffd08c 0 2px, transparent 3px),
+        radial-gradient(ellipse at 67% 30%, #1d130e 0 4px, transparent 5px),
+        radial-gradient(ellipse at 49% 64%, #f1a34d 0 3px, transparent 4px),
+        linear-gradient(160deg, #5b291d, #a34d25 46%, #391b14);
+      background-size: 47px 31px, 53px 39px, 61px 41px, auto;
+      box-shadow: inset 0 9px 8px #e68e4e55, 0 10px 0 #351a12, 0 15px 12px #12090485;
+      --layer-y: 57px;
+      --layer-z: 20px;
+      --explode-y: 50px;
+    }
+    .cheese {
+      z-index: 3;
+      width: 292px;
+      height: 63px;
+      border: 2px solid #f9d267;
+      border-radius: 45%;
+      background: linear-gradient(145deg, #ffe77d, #f6aa32 75%);
+      clip-path: polygon(0 14%, 12% 5%, 25% 13%, 41% 2%, 55% 12%, 69% 1%, 84% 12%, 100% 4%, 97% 82%, 88% 86%, 84% 100%, 74% 87%, 60% 98%, 47% 88%, 30% 100%, 19% 87%, 4% 92%);
+      filter: drop-shadow(0 8px 2px #8c451c);
+      --layer-y: 32px;
+      --layer-z: 29px;
+      --layer-turn: -3deg;
+      --explode-y: 22px;
+    }
+    .lettuce {
+      z-index: 4;
+      width: 318px;
+      height: 49px;
+      border: 3px solid #a4bd42;
+      border-radius: 46% 54% 43% 57%;
+      background:
+        radial-gradient(ellipse at 12% 48%, #c8dd56 0 15px, transparent 16px),
+        radial-gradient(ellipse at 31% 40%, #91af36 0 19px, transparent 20px),
+        radial-gradient(ellipse at 50% 58%, #c0d74b 0 21px, transparent 22px),
+        radial-gradient(ellipse at 72% 42%, #8fae31 0 20px, transparent 21px),
+        radial-gradient(ellipse at 91% 57%, #c9dc59 0 17px, transparent 18px),
+        #71942a;
+      box-shadow: 0 8px 0 #57751c, 0 12px 9px #17100a75;
+      --layer-y: 11px;
+      --layer-z: 37px;
+      --layer-turn: 2deg;
+      --explode-y: 0px;
+    }
+    .tomato {
+      z-index: 5;
+      width: 125px;
+      height: 33px;
+      border: 5px solid #ff8762;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 50%, #f67c51 0 18%, #c73526 20% 72%, #842419 74%);
+      box-shadow: 0 8px 0 #80281d;
+      --layer-y: -12px;
+      --layer-z: 44px;
+      --explode-y: -52px;
+    }
+    .tomato.two { margin-left: 75px; transform: translate(-50%, -50%) translateY(calc(-12px + var(--explode-y, 0px))) translateZ(46px) rotateX(57deg) rotateZ(8deg); }
+    .onion {
+      z-index: 6;
+      width: 230px;
+      height: 20px;
+      border: 5px solid #e4d4b9;
+      border-radius: 50%;
+      background: #8b5c9440;
+      box-shadow: 0 5px 0 #ab8d8e;
+      --layer-y: -31px;
+      --layer-z: 52px;
+      --explode-y: -94px;
+    }
+    .top-bun {
+      z-index: 7;
+      width: 254px;
+      height: 130px;
+      border: 3px solid #f5ca78;
+      border-radius: 50% 50% 36% 36% / 66% 66% 34% 34%;
+      background:
+        radial-gradient(ellipse at 29% 29%, #ffe6a7 0 2px, transparent 3px),
+        radial-gradient(ellipse at 57% 20%, #fff0bf 0 2px, transparent 3px),
+        radial-gradient(ellipse at 71% 36%, #ffe6a7 0 2px, transparent 3px),
+        radial-gradient(ellipse at 44% 46%, #ffe6a7 0 2px, transparent 3px),
+        linear-gradient(163deg, #ffd678, #d88936 72%, #a95425);
+      background-size: 38px 30px, 43px 36px, 40px 35px, 51px 40px, auto;
+      box-shadow: inset 0 12px 20px #fff1b475, inset 0 -14px 12px #9f4c2875, 0 13px 0 #813f21, 0 23px 23px #130b0675;
+      --layer-y: -74px;
+      --layer-z: 65px;
+      --explode-y: -148px;
+    }
+    .hero-interaction {
+      position: absolute;
+      z-index: 3;
+      bottom: 2%;
+      left: 50%;
+      min-height: 36px;
+      padding: 0 15px;
+      border: 1px solid #ffffff40;
+      border-radius: 999px;
+      color: var(--cream);
+      background: #171713d9;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .02em;
+      transform: translateX(-50%);
+      transition: color .2s, background .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .hero-interaction:hover, .hero-interaction[aria-pressed="true"] { border-color: var(--acid); color: var(--ink); background: var(--acid); }
+    .hero-tag {
+      position: absolute;
+      z-index: 2;
+      right: 3%;
+      bottom: 17%;
+      display: grid;
+      width: 90px;
+      height: 90px;
+      place-items: center;
+      border: 1px solid #fff6;
+      border-radius: 50%;
+      color: var(--ink);
+      background: var(--acid);
+      text-align: center;
+      font-size: 10px;
+      font-weight: 950;
+      line-height: 1.25;
+      transform: rotate(9deg) translateZ(85px);
+      animation: tag-turn 18s linear infinite;
+    }
+    @keyframes tag-turn { to { rotate: 0 0 1 369deg; } }
+    .steam {
+      position: absolute;
+      top: 13%;
+      width: 15px;
+      height: 74px;
+      border-left: 2px solid #fff6;
+      border-radius: 50%;
+      filter: blur(1px);
+      animation: steam-rise 3s ease-in-out infinite;
+    }
+    .steam.one { left: 40%; }
+    .steam.two { left: 52%; height: 58px; animation-delay: -1.1s; }
+    .steam.three { left: 62%; height: 82px; animation-delay: -2s; }
+    @keyframes steam-rise {
+      0%, 100% { opacity: 0; translate: 0 12px; scale: .8 1; }
+      40%, 70% { opacity: .65; }
+      50% { translate: 7px -12px; scale: 1.15 1; }
+    }
+
+    .ticker { overflow: hidden; border-block: 1px solid #ffffff16; background: #202019; }
+    .ticker-track { display: flex; width: max-content; gap: 28px; padding: 14px 0; animation: ticker 32s linear infinite; }
+    .ticker-track span { color: #d7d0c2; font-size: 11px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+    .ticker-track b { color: var(--orange); }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+    .menu-section { padding: 82px 0 96px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .section-heading h2 { margin: 9px 0 0; font-size: clamp(36px, 5vw, 55px); font-weight: 950; letter-spacing: -.075em; text-transform: uppercase; }
+    .section-heading p { max-width: 310px; margin: 0 0 5px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .menu-tools { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .categories { display: flex; flex: 1; gap: 8px; overflow-x: auto; padding: 3px; scrollbar-width: none; }
+    .categories::-webkit-scrollbar { display: none; }
+    .category {
+      flex-shrink: 0;
+      padding: 10px 15px;
+      border: 1px solid #ffffff22;
+      border-radius: 999px;
+      color: #c9c2b4;
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+      transition: .2s;
+    }
+    .category:hover, .category.active { border-color: var(--acid); color: var(--ink); background: var(--acid); }
+    .search-box { display: flex; width: 205px; flex-shrink: 0; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid #ffffff22; border-radius: 999px; color: var(--muted); }
+    .search-box input { width: 100%; min-width: 0; padding: 10px 0; border: 0; outline: 0; color: var(--cream); background: transparent; font-size: 11px; }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; perspective: 1400px; }
+    .product-card {
+      --card-x: 0deg;
+      --card-y: 0deg;
+      --shine-x: 50%;
+      --shine-y: 50%;
+      position: relative;
+      overflow: clip;
+      border: 1px solid #ffffff18;
+      border-radius: 15px;
+      background: linear-gradient(145deg, #292921, #202019);
+      box-shadow: 0 7px 24px #0002;
+      transform: perspective(950px) rotateX(var(--card-x)) rotateY(var(--card-y));
+      transform-style: preserve-3d;
+      transition: transform .22s ease-out, box-shadow .22s;
+      backface-visibility: hidden;
+    }
+    .product-card:hover { box-shadow: var(--shadow); }
+    .product-card.is-touching { will-change: transform; box-shadow: var(--shadow); }
+    .product-image { position: relative; height: 215px; overflow: hidden; background: #3a291b; transform-style: preserve-3d; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; transform: translateZ(0); transition: transform .4s; }
+    .product-image::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #10100b05 35%, #10100bb3), radial-gradient(circle at var(--shine-x) var(--shine-y), #fff6, transparent 46%);
+      content: "";
+      opacity: .9;
+      pointer-events: none;
+    }
+    .product-card:hover .product-image img { transform: translateZ(16px) scale(1.055); }
+    .product-card.is-touching .product-image img { transform: translateZ(16px) scale(1.045); }
+    .product-badge { position: absolute; z-index: 1; top: 13px; left: 13px; padding: 7px 10px; border-radius: 999px; color: var(--ink); background: var(--acid); font-size: 9px; font-weight: 950; transform: translateZ(22px); }
+    .product-body { padding: 17px 17px 16px; transform: translateZ(14px); }
+    .product-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .product-title-row h3 { margin: 0; font-size: 19px; font-weight: 900; letter-spacing: -.04em; }
+    .product-price { color: var(--acid); font-size: 18px; font-weight: 950; white-space: nowrap; }
+    .product-description { min-height: 35px; margin: 8px 0 15px; color: #b0aa9d; font-size: 11px; line-height: 1.55; }
+    .product-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 12px; border-top: 1px solid #ffffff17; }
+    .product-bottom small { color: var(--muted); font-size: 10px; }
+    .add-button {
+      display: inline-flex;
+      min-height: 37px;
+      align-items: center;
+      gap: 7px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      color: var(--ink);
+      background: var(--acid);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 900;
+      transition: transform .2s, background .2s;
+    }
+    .add-button:hover { transform: translateY(-2px); background: #e3ff89; }
+    .add-button.added { color: white; background: #53764a; transform: scale(1.04); }
+    .empty-results { grid-column: 1/-1; padding: 45px 20px; border: 1px dashed #ffffff35; border-radius: 15px; color: var(--muted); text-align: center; }
+    .story { display: grid; grid-template-columns: .85fr 1fr; gap: 35px; align-items: center; margin-bottom: 90px; padding: 38px; border: 1px solid #ffffff19; border-radius: 18px; background: #202019; }
+    .story-art { position: relative; min-height: 260px; overflow: hidden; border-radius: 12px; background: #38281c; }
+    .story-art img { width: 100%; height: 100%; min-height: 260px; object-fit: cover; filter: saturate(.82); }
+    .story-art::after { position: absolute; inset: 0; background: linear-gradient(0deg, #17171380, transparent 65%); content: ""; }
+    .story-copy h2 { margin: 11px 0; font-size: 34px; font-weight: 950; letter-spacing: -.07em; line-height: .98; text-transform: uppercase; }
+    .story-copy p { max-width: 480px; margin: 0; color: #b2ac9e; font-size: 12px; line-height: 1.8; }
+    .story-stats { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 22px; }
+    .story-stats strong { display: block; color: var(--acid); font-size: 20px; }
+    .story-stats span { color: var(--muted); font-size: 10px; }
+    footer { border-top: 1px solid #ffffff19; background: #13130f; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 0; color: var(--muted); font-size: 10px; }
+    .footer-inner strong { color: var(--cream); }
+    .footer-links { display: flex; gap: 17px; }
+    .footer-links a:hover { color: var(--acid); }
+
+    .overlay { position: fixed; z-index: 10; inset: 0; visibility: hidden; background: #050504bd; opacity: 0; transition: opacity .22s, visibility .22s; }
+    .overlay.open { visibility: visible; opacity: 1; }
+    .cart-drawer {
+      position: fixed;
+      z-index: 11;
+      top: 0;
+      right: 0;
+      display: flex;
+      width: min(440px, 100%);
+      height: 100dvh;
+      flex-direction: column;
+      padding: 24px;
+      border-left: 1px solid #ffffff20;
+      color: var(--cream);
+      background: #202019;
+      box-shadow: -20px 0 60px #0005;
+      transform: translateX(105%);
+      transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    }
+    .cart-drawer.open { transform: translateX(0); }
+    .drawer-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #ffffff20; }
+    .drawer-heading h2 { margin: 0; font-size: 23px; font-weight: 950; letter-spacing: -.05em; }
+    .icon-button { display: grid; width: 39px; height: 39px; place-items: center; border: 1px solid #ffffff25; border-radius: 50%; color: var(--cream); background: transparent; cursor: pointer; font-size: 20px; }
+    .cart-items { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .cart-empty { display: grid; min-height: 220px; place-content: center; justify-items: center; color: var(--muted); text-align: center; }
+    .cart-empty span { margin-bottom: 12px; font-size: 42px; }
+    .cart-empty strong { color: var(--cream); font-size: 15px; }
+    .cart-empty p { margin: 6px 0 0; font-size: 11px; }
+    .cart-row { display: grid; grid-template-columns: 65px 1fr auto; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid #ffffff14; }
+    .cart-row img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; }
+    .cart-row h3 { margin: 0 0 4px; font-size: 12px; }
+    .cart-row p { margin: 0; color: var(--muted); font-size: 10px; }
+    .cart-line-price { color: var(--acid); font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .quantity { display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .quantity button { display: grid; width: 25px; height: 25px; place-items: center; border: 1px solid #ffffff30; border-radius: 50%; color: var(--cream); background: transparent; cursor: pointer; }
+    .cart-bottom { padding-top: 14px; border-top: 1px solid #ffffff20; }
+    .total-row { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; color: var(--muted); font-size: 11px; }
+    .total-row strong { color: var(--cream); }
+    .total-row.grand { margin-top: 13px; color: var(--cream); font-size: 17px; font-weight: 900; }
+    .checkout-button { width: 100%; min-height: 46px; margin-top: 10px; border: 0; border-radius: 9px; color: var(--ink); background: var(--acid); cursor: pointer; font-size: 12px; font-weight: 900; }
+    .checkout-button:disabled { cursor: not-allowed; opacity: .42; }
+    .delivery-hint { margin: 9px 0 0; color: var(--muted); text-align: center; font-size: 10px; }
+    .modal-wrap { position: fixed; z-index: 15; inset: 0; display: grid; visibility: hidden; place-items: center; padding: 16px; background: #050504ce; opacity: 0; transition: .2s; }
+    .modal-wrap.open { visibility: visible; opacity: 1; }
+    .modal { width: min(460px, 100%); max-height: min(90dvh, 720px); overflow-y: auto; padding: 25px; border: 1px solid #ffffff20; border-radius: 16px; background: #22221c; box-shadow: var(--shadow); }
+    .modal-heading { display: flex; align-items: start; justify-content: space-between; gap: 15px; margin-bottom: 18px; }
+    .modal-heading p { margin: 0; color: var(--acid); font-size: 10px; font-weight: 900; text-transform: uppercase; }
+    .modal-heading h2 { margin: 5px 0 0; font-size: 25px; font-weight: 950; letter-spacing: -.05em; }
+    .form-grid { display: grid; gap: 12px; }
+    .form-field { display: grid; gap: 6px; color: #c6c0b3; font-size: 10px; font-weight: 800; }
+    .form-field input, .form-field select { width: 100%; padding: 12px; border: 1px solid #ffffff25; border-radius: 8px; color: var(--cream); background: #171713; font-size: 12px; }
+    .form-field select option { background: #171713; }
+    .form-note { margin: 13px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .success-state { padding: 16px 4px 4px; text-align: center; }
+    .success-icon { display: grid; width: 58px; height: 58px; margin: 0 auto 14px; place-items: center; border-radius: 50%; color: var(--ink); background: var(--acid); font-size: 25px; }
+    .success-state h2 { margin-bottom: 8px; font-size: 25px; }
+    .success-state p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .toast { position: fixed; z-index: 20; right: 20px; bottom: 20px; padding: 12px 16px; border: 1px solid #ffffff20; border-radius: 10px; color: var(--cream); background: #22221c; box-shadow: var(--shadow); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 850px) {
+      .nav { gap: 20px; }
+      .nav-links { gap: 17px; }
+      .hero-inner { min-height: 430px; grid-template-columns: .95fr 1.05fr; }
+      .hero-art { min-height: 395px; }
+      .burger-model { width: min(42vw, 360px); height: 380px; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 600px) {
+      .wrap { width: min(calc(100% - 30px), 460px); }
+      .announcement { padding: 8px 10px; font-size: 9px; }
+      .nav { position: relative; min-height: 64px; gap: 8px; }
+      .brand { gap: 7px; }
+      .brand-mark { width: 33px; height: 33px; font-size: 18px; }
+      .brand-name { font-size: 13px; }
+      .nav-links {
+        position: absolute;
+        top: calc(100% + 1px);
+        right: 0;
+        left: 0;
+        display: none;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0;
+        padding: 7px 14px;
+        border: 1px solid #ffffff20;
+        border-radius: 0 0 12px 12px;
+        background: #202019;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 12px 4px; }
+      .mobile-menu-button { display: inline-flex; }
+      .nav-right { gap: 7px; }
+      .cart-trigger { gap: 6px; padding: 8px 9px; font-size: 10px; }
+      .hero { padding: 34px 0 32px; }
+      .hero-inner { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .hero-copy { max-width: 100%; }
+      .hero h1 { max-width: 430px; margin: 13px 0; font-size: clamp(55px, 15vw, 76px); }
+      .hero-copy > p { max-width: 390px; margin-bottom: 18px; font-size: 12px; }
+      .hero-actions { gap: 11px; }
+      .primary-button { min-height: 44px; padding: 0 16px; font-size: 11px; }
+      .hero-note { font-size: 10px; }
+      .hero-art { min-height: 345px; margin-top: 4px; }
+      .hero-art::before { width: 275px; }
+      .hero-art::after { bottom: 10%; width: 260px; }
+      .burger-model { width: 320px; height: 345px; min-height: 0; scale: .82; }
+      .hero-tag { right: 5%; bottom: 13%; width: 72px; height: 72px; font-size: 8px; }
+      .steam { top: 5%; }
+      .ticker-track { padding: 12px 0; }
+      .menu-section { padding: 56px 0 64px; }
+      .section-heading { align-items: start; flex-direction: column; gap: 8px; margin-bottom: 19px; }
+      .section-heading h2 { font-size: 39px; }
+      .section-heading p { max-width: 390px; }
+      .menu-tools { align-items: stretch; flex-direction: column-reverse; gap: 9px; }
+      .search-box { width: 100%; }
+      .product-grid { grid-template-columns: 1fr; gap: 13px; }
+      .product-card { display: flex; flex-direction: column; }
+      .product-image { height: 205px; }
+      .product-body { padding: 14px 15px; }
+      .product-description { min-height: 0; margin: 7px 0 12px; }
+      .story { grid-template-columns: 1fr; gap: 20px; margin-bottom: 60px; padding: 18px; }
+      .story-art, .story-art img { min-height: 190px; }
+      .story-copy h2 { font-size: 29px; }
+      .footer-inner { align-items: start; flex-direction: column; padding: 20px 0; }
+      .cart-drawer { padding: 18px; }
+    }
+    @media (max-width: 360px) {
+      .wrap { width: calc(100% - 20px); }
+      .nav { gap: 4px; }
+      .nav-right { gap: 4px; }
+      .brand-name { font-size: 10px; letter-spacing: .04em; }
+      .mobile-menu-button { padding: 7px; font-size: 9px; }
+      .cart-trigger { gap: 5px; padding: 7px; font-size: 9px; }
+      .hero h1 { font-size: 53px; }
+      .hero-art { min-height: 300px; }
+      .burger-model { scale: .72; }
+      .hero-tag { right: 8%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      .burger-model { animation: none; will-change: auto; }
+      .ticker-track, .hero-tag, .steam { animation: none; }
+      .product-card { transform: none !important; will-change: auto; }
+      .product-card:hover .product-image img, .product-card.is-touching .product-image img { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">Сковородка раскалена · готовим бургеры после заказа</div>
+  <header class="header">
+    <div class="wrap nav">
+      <a class="brand" href="#home" aria-label="ЖАР — на главную">
+        <span class="brand-mark" aria-hidden="true">Ж</span>
+        <span class="brand-name">ЖАР<span>.</span> БУРГЕРНАЯ</span>
+      </a>
+      <nav class="nav-links" id="site-navigation" aria-label="Основная навигация">
+        <a href="#menu">Меню</a>
+        <a href="#about">Наш огонь</a>
+      </nav>
+      <div class="nav-right">
+        <button class="mobile-menu-button" id="mobile-menu-button" type="button" aria-expanded="false" aria-controls="site-navigation">Меню</button>
+        <button class="cart-trigger" id="open-cart" type="button" aria-label="Открыть корзину">
+          Корзина <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="home">
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow">Без фокусов. Только огонь.</div>
+          <h1>Бургер.<span>И точка.</span></h1>
+          <p>Мясо шипит на раскалённом гриле, булка ловит румянец, соус делаем сами. Собрали всё честное между двумя половинками бриоши.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#menu">Смотреть меню <span aria-hidden="true">↘</span></a>
+            <span class="hero-note"><b>✳</b> Готовим после заказа</span>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Интерактивный трёхмерный бургер">
+          <canvas class="hero-3d-canvas" aria-hidden="true"></canvas>
+          <span class="steam one" aria-hidden="true"></span>
+          <span class="steam two" aria-hidden="true"></span>
+          <span class="steam three" aria-hidden="true"></span>
+          <div class="burger-model" role="img" aria-label="Двойной бургер с булкой бриошь, двумя котлетами, сыром, салатом, помидорами, огурцами и красным луком">
+            <span class="burger-layer bottom-bun"></span>
+            <span class="burger-layer patty"></span>
+            <span class="burger-layer cheese"></span>
+            <span class="burger-layer lettuce"></span>
+            <span class="burger-layer tomato"></span>
+            <span class="burger-layer tomato two"></span>
+            <span class="burger-layer onion"></span>
+            <span class="burger-layer top-bun"></span>
+          </div>
+          <div class="hero-tag">100%<br>ГОРЯЧИЙ<br>ХАРАКТЕР</div>
+          <div class="hero-rotate-hint" aria-hidden="true">Потяни — вращай на 360°</div>
+          <button class="hero-drag-target" type="button" aria-label="Вращай бургер: перетаскивай мышью или пальцем, либо нажимай стрелки на клавиатуре. Нажатие разбирает бургер"></button>
+          <button class="hero-interaction" type="button" aria-pressed="false" aria-label="Разобрать бургер на слои">Разобрать бургер</button>
+        </div>
+      </div>
+    </section>
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>Свежая булка <b>✳</b></span><span>Горячий гриль <b>✳</b></span><span>Свой соус <b>✳</b></span><span>Никаких компромиссов <b>✳</b></span>
+        <span>Свежая булка <b>✳</b></span><span>Горячий гриль <b>✳</b></span><span>Свой соус <b>✳</b></span><span>Никаких компромиссов <b>✳</b></span>
+      </div>
+    </div>
+    <section class="wrap menu-section" id="menu">
+      <div class="section-heading">
+        <div><div class="eyebrow">Выбирай, что сегодня по душе</div><h2>Меню огня</h2></div>
+        <p>Каждый бургер собираем вручную и сразу с гриля. Выбирай своего героя.</p>
+      </div>
+      <div class="menu-tools">
+        <div class="categories" id="categories" role="group" aria-label="Фильтр по категориям"></div>
+        <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Найти бургер" aria-label="Найти бургер"></label>
+      </div>
+      <div class="product-grid" id="product-grid" aria-live="polite"></div>
+    </section>
+    <section class="wrap story" id="about">
+      <div class="story-art"><img src="assets/burgers/double.jpg" alt="Бургер с гриля крупным планом" loading="lazy"></div>
+      <div class="story-copy">
+        <div class="eyebrow">Огонь делает своё</div>
+        <h2>Не спешим.<br>Жарим как надо.</h2>
+        <p>Мы не собираем бургеры заранее. Котлета отправляется на огонь только после твоего заказа, булка подрумянивается на гриле, а соус смешиваем небольшими порциями каждый день.</p>
+        <div class="story-stats"><div><strong>100%</strong><span>говядина без добавок</span></div><div><strong>180°</strong><span>температура гриля</span></div><div><strong>0 мин</strong><span>ожидания в разогреве</span></div></div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap footer-inner">
+      <div><strong>ЖАР. БУРГЕРНАЯ</strong> · Вымышленное место с настоящим аппетитом</div>
+      <div class="footer-links"><a href="#menu">Меню</a><a href="#about">Наш огонь</a></div>
+      <div>Учебный макет · заказы не отправляются</div>
+    </div>
+  </footer>
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Корзина" aria-hidden="true" inert>
+    <div class="drawer-heading"><h2>Твоя корзина</h2><button class="icon-button" id="close-cart" type="button" aria-label="Закрыть корзину">×</button></div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-bottom">
+      <div class="total-row"><span>Сумма заказа</span><strong id="subtotal">0 ₽</strong></div>
+      <div class="total-row"><span>Доставка</span><strong id="delivery-cost">Бесплатно</strong></div>
+      <div class="total-row grand"><span>Итого</span><strong id="total">0 ₽</strong></div>
+      <button class="checkout-button" id="checkout" type="button" disabled>Оформить заказ →</button>
+      <p class="delivery-hint" id="delivery-hint">Добавь что-нибудь горячее в корзину</p>
+    </div>
+  </aside>
+  <div class="modal-wrap" id="checkout-modal" role="presentation" inert>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title"></section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const products = [
+      { id: "smash", name: "Смэш-классик", category: "Классика", badge: "ХИТ", description: "Две тонкие котлеты, чеддер, лук, соус ЖАР", price: 590, image: "smash.jpg" },
+      { id: "double", name: "Двойной ЖАР", category: "Мясные", badge: "ДВОЙНОЙ УДАР", description: "Две котлеты, двойной чеддер, BBQ, маринованный огурец", price: 790, image: "double.jpg" },
+      { id: "bbq", name: "Дымный BBQ", category: "Мясные", badge: "С ОГНЯ", description: "Говядина, копчёный соус, хрустящий лук, бекон", price: 720, image: "bbq.jpg" },
+      { id: "cheese", name: "Сырный плавень", category: "Сырные", badge: "ТЯНЕТСЯ", description: "Чеддер, сырный соус, говядина, бриошь", price: 680, image: "cheese.jpg" },
+      { id: "green", name: "Зелёный хулиган", category: "Без мяса", badge: "БЕЗ МЯСА", description: "Гриль-овощи, халлуми, салат, соус из трав", price: 610, image: "veggie.jpg" },
+      { id: "chicken", name: "Курица на гриле", category: "Птица", badge: "НЕ ОСТРАЯ", description: "Куриное филе, салат, огурец, сливочный соус", price: 620, image: "chicken.jpg" }
+    ];
+    const cart = new Map();
+    let activeCategory = "Все";
+    let toastTimeout;
+    const money = amount => `${Math.round(amount).toLocaleString("ru-RU")} ₽`;
+    const imageUrl = filename => `assets/burgers/${filename}`;
+    const grid = document.querySelector("#product-grid");
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canUse3D = matchMedia("(hover: hover) and (pointer: fine)").matches && !reducedMotion;
+    const canUseTouch3D = matchMedia("(pointer: coarse)").matches && !reducedMotion;
+
+    function setTilt(element, x, y, prefix, maxTilt = 12) {
+      const bounds = element.getBoundingClientRect();
+      const normalizedX = Math.max(-.5, Math.min(.5, (x - bounds.left) / bounds.width - .5));
+      const normalizedY = Math.max(-.5, Math.min(.5, (y - bounds.top) / bounds.height - .5));
+      const tiltX = prefix === "card" ? "--card-x" : `--${prefix}-rotate-x`;
+      const tiltY = prefix === "card" ? "--card-y" : `--${prefix}-rotate-y`;
+      element.style.setProperty(tiltX, `${(-normalizedY * maxTilt).toFixed(2)}deg`);
+      element.style.setProperty(tiltY, `${(normalizedX * maxTilt).toFixed(2)}deg`);
+      if (prefix === "card") {
+        element.style.setProperty("--shine-x", `${((normalizedX + .5) * 100).toFixed(1)}%`);
+        element.style.setProperty("--shine-y", `${((normalizedY + .5) * 100).toFixed(1)}%`);
+      }
+    }
+    const heroArt = document.querySelector(".hero-art");
+    const burgerInteraction = document.querySelector(".hero-interaction");
+    const toggleBurgerExplosion = () => {
+      const exploded = heroArt.classList.toggle("exploded");
+      burgerInteraction.setAttribute("aria-pressed", String(exploded));
+      burgerInteraction.setAttribute("aria-label", exploded ? "Собрать бургер обратно" : "Разобрать бургер на слои");
+      burgerInteraction.textContent = exploded ? "Собрать бургер" : "Разобрать бургер";
+      heroArt.dispatchEvent(new CustomEvent("burger:explode", { detail: { exploded } }));
+    };
+    burgerInteraction.addEventListener("click", toggleBurgerExplosion);
+
+    const categories = ["Все", ...new Set(products.map(product => product.category))];
+    const categoriesHost = document.querySelector("#categories");
+    categories.forEach(category => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `category${category === activeCategory ? " active" : ""}`;
+      button.textContent = category;
+      button.setAttribute("aria-pressed", String(category === activeCategory));
+      button.addEventListener("click", () => {
+        activeCategory = category;
+        categoriesHost.querySelectorAll(".category").forEach(chip => {
+          const selected = chip.textContent === activeCategory;
+          chip.classList.toggle("active", selected);
+          chip.setAttribute("aria-pressed", String(selected));
+        });
+        renderProducts();
+      });
+      categoriesHost.append(button);
+    });
+
+    function renderProducts() {
+      const query = document.querySelector("#search").value.trim().toLocaleLowerCase("ru");
+      const visible = products.filter(product => {
+        const matchesCategory = activeCategory === "Все" || product.category === activeCategory;
+        const matchesSearch = `${product.name} ${product.description}`.toLocaleLowerCase("ru").includes(query);
+        return matchesCategory && matchesSearch;
+      });
+      grid.replaceChildren();
+      if (!visible.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-results";
+        empty.textContent = "Такого бургера пока нет. Попробуй другое название.";
+        grid.append(empty);
+        return;
+      }
+      visible.forEach(product => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-image">
+            <img src="${imageUrl(product.image)}" alt="Бургер «${product.name}»" loading="lazy">
+            <span class="product-badge">${product.badge}</span>
+          </div>
+          <div class="product-body">
+            <div class="product-title-row"><h3>${product.name}</h3><span class="product-price">${money(product.price)}</span></div>
+            <p class="product-description">${product.description}</p>
+            <div class="product-bottom"><small>Сочный · с огня</small><button class="add-button" type="button"><span aria-hidden="true">＋</span><span class="add-label">В корзину</span></button></div>
+          </div>`;
+        const image = card.querySelector("img");
+        image.addEventListener("error", () => {
+          image.closest(".product-image").style.background = "linear-gradient(135deg,#725134,#2c2117)";
+          image.remove();
+        }, { once: true });
+        if (canUse3D) {
+          card.addEventListener("pointermove", event => {
+            if (event.pointerType === "mouse" || event.pointerType === "pen") setTilt(card, event.clientX, event.clientY, "card");
+          });
+          card.addEventListener("pointerleave", () => {
+            card.style.setProperty("--card-x", "0deg");
+            card.style.setProperty("--card-y", "0deg");
+            card.style.setProperty("--shine-x", "50%");
+            card.style.setProperty("--shine-y", "50%");
+          });
+        }
+        if (canUseTouch3D) {
+          let activePointer = null;
+          const photo = card.querySelector("img");
+          const reset = () => {
+            activePointer = null;
+            card.classList.remove("is-touching");
+            card.style.removeProperty("will-change");
+            card.style.removeProperty("--touch-shine");
+            card.style.setProperty("--card-x", "0deg");
+            card.style.setProperty("--card-y", "0deg");
+            photo.style.removeProperty("transform");
+          };
+          card.addEventListener("pointerdown", event => {
+            if (event.pointerType !== "touch" || !event.isPrimary) return;
+            activePointer = event.pointerId;
+            card.classList.add("is-touching");
+            card.style.setProperty("will-change", "transform");
+            card.style.setProperty("--touch-shine", "1");
+            photo.style.setProperty("transform", "translateZ(16px) scale(1.045)");
+            setTilt(card, event.clientX, event.clientY, "card", 7);
+          });
+          card.addEventListener("pointermove", event => {
+            if (event.pointerType === "touch" && event.pointerId === activePointer) setTilt(card, event.clientX, event.clientY, "card", 7);
+          });
+          card.addEventListener("pointerup", event => { if (event.pointerId === activePointer) reset(); });
+          card.addEventListener("pointercancel", event => { if (event.pointerId === activePointer) reset(); });
+        }
+        const button = card.querySelector(".add-button");
+        const label = card.querySelector(".add-label");
+        let feedbackTimeout;
+        button.addEventListener("click", () => {
+          addToCart(product);
+          button.classList.add("added");
+          label.textContent = "Добавлено";
+          clearTimeout(feedbackTimeout);
+          feedbackTimeout = setTimeout(() => {
+            button.classList.remove("added");
+            label.textContent = "В корзину";
+          }, 900);
+          const count = document.querySelector("#cart-count");
+          count.classList.remove("bump");
+          void count.offsetWidth;
+          count.classList.add("bump");
+        });
+        grid.append(card);
+      });
+    }
+
+    function addToCart(product) {
+      const item = cart.get(product.id);
+      cart.set(product.id, { product, quantity: item ? item.quantity + 1 : 1 });
+      renderCart();
+      showToast(`${product.name} добавлен в корзину`);
+    }
+    function cartTotals() {
+      const subtotal = [...cart.values()].reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+      const fulfillment = document.querySelector("#fulfillment");
+      const pickup = fulfillment && fulfillment.value === "pickup";
+      const delivery = pickup || subtotal === 0 || subtotal >= 1200 ? 0 : 149;
+      return { subtotal, delivery, total: subtotal + delivery };
+    }
+    function itemWord(count) {
+      const lastDigit = count % 10;
+      const lastTwo = count % 100;
+      if (lastTwo >= 11 && lastTwo <= 14) return "бургеров";
+      if (lastDigit === 1) return "бургер";
+      if (lastDigit >= 2 && lastDigit <= 4) return "бургера";
+      return "бургеров";
+    }
+    function renderCart() {
+      const host = document.querySelector("#cart-items");
+      host.replaceChildren();
+      const count = [...cart.values()].reduce((sum, item) => sum + item.quantity, 0);
+      document.querySelector("#cart-count").textContent = count;
+      document.querySelector("#cart-count").setAttribute("aria-label", `${count} ${itemWord(count)}`);
+      document.querySelector("#checkout").disabled = count === 0;
+      if (!count) {
+        const empty = document.createElement("div");
+        empty.className = "cart-empty";
+        empty.innerHTML = "<span aria-hidden=\"true\">🍔</span><strong>Пока пусто</strong><p>Выбери что-нибудь с огня</p>";
+        host.append(empty);
+      } else {
+        cart.forEach((item, key) => {
+          const row = document.createElement("div");
+          row.className = "cart-row";
+          row.innerHTML = `<img src="${imageUrl(item.product.image)}" alt=""><div><h3>${item.product.name}</h3><p>${money(item.product.price)} / шт.</p><div class="quantity"><button type="button" data-action="decrease" aria-label="Уменьшить количество">−</button><span>${item.quantity}</span><button type="button" data-action="increase" aria-label="Увеличить количество">+</button></div></div><div class="cart-line-price">${money(item.product.price * item.quantity)}</div>`;
+          row.querySelector('[data-action="decrease"]').addEventListener("click", () => changeQuantity(key, -1));
+          row.querySelector('[data-action="increase"]').addEventListener("click", () => changeQuantity(key, 1));
+          const img = row.querySelector("img");
+          img.addEventListener("error", () => { img.hidden = true; }, { once: true });
+          host.append(row);
+        });
+      }
+      const totals = cartTotals();
+      document.querySelector("#subtotal").textContent = money(totals.subtotal);
+      document.querySelector("#delivery-cost").textContent = totals.delivery ? money(totals.delivery) : "Бесплатно";
+      document.querySelector("#total").textContent = money(totals.total);
+      const checkoutTotal = document.querySelector("#checkout-total");
+      if (checkoutTotal) checkoutTotal.textContent = money(totals.total);
+      const hint = document.querySelector("#delivery-hint");
+      hint.textContent = count === 0 ? "Добавь что-нибудь горячее в корзину"
+        : document.querySelector("#fulfillment")?.value === "pickup" ? "Самовывоз — бесплатно"
+          : totals.subtotal >= 1200 ? "Доставка за наш счёт!"
+            : `До бесплатной доставки осталось ${money(1200 - totals.subtotal)}`;
+    }
+    function changeQuantity(key, delta) {
+      const item = cart.get(key);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) cart.delete(key);
+      renderCart();
+    }
+    function showToast(message) {
+      const toast = document.querySelector("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove("show"), 1900);
+    }
+
+    const drawer = document.querySelector("#cart-drawer");
+    const overlay = document.querySelector("#overlay");
+    const checkoutModal = document.querySelector("#checkout-modal");
+    function openCart() {
+      overlay.classList.add("open");
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      drawer.removeAttribute("inert");
+      document.body.classList.add("locked");
+      document.querySelector("#close-cart").focus();
+    }
+    function closeCart() {
+      overlay.classList.remove("open");
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      drawer.setAttribute("inert", "");
+      if (!checkoutModal.classList.contains("open")) document.body.classList.remove("locked");
+      document.querySelector("#open-cart").focus();
+    }
+    document.querySelector("#open-cart").addEventListener("click", openCart);
+    document.querySelector("#close-cart").addEventListener("click", closeCart);
+    overlay.addEventListener("click", closeCart);
+    document.querySelector("#search").addEventListener("input", renderProducts);
+
+    const mobileMenuButton = document.querySelector("#mobile-menu-button");
+    const siteNavigation = document.querySelector("#site-navigation");
+    mobileMenuButton.addEventListener("click", () => {
+      const open = mobileMenuButton.getAttribute("aria-expanded") === "true";
+      mobileMenuButton.setAttribute("aria-expanded", String(!open));
+      mobileMenuButton.textContent = open ? "Меню" : "Закрыть";
+      siteNavigation.classList.toggle("open", !open);
+    });
+    siteNavigation.addEventListener("click", event => {
+      if (event.target.closest("a")) {
+        mobileMenuButton.setAttribute("aria-expanded", "false");
+        mobileMenuButton.textContent = "Меню";
+        siteNavigation.classList.remove("open");
+      }
+    });
+
+    function closeCheckout() {
+      checkoutModal.classList.remove("open");
+      checkoutModal.setAttribute("inert", "");
+      if (drawer.classList.contains("open")) {
+        drawer.setAttribute("aria-hidden", "false");
+        drawer.removeAttribute("inert");
+      } else {
+        document.body.classList.remove("locked");
+      }
+    }
+    function resetCheckoutModal() {
+      checkoutModal.querySelector(".modal").innerHTML = `
+        <div class="modal-heading"><div><p>Учебный макет · оплаты нет</p><h2 id="checkout-title">Куда привезти?</h2></div><button class="icon-button" id="close-checkout" type="button" aria-label="Закрыть оформление">×</button></div>
+        <form class="form-grid" id="checkout-form">
+          <label class="form-field">Твоё имя<input name="name" required maxlength="80" autocomplete="name" placeholder="Например, Саша"></label>
+          <label class="form-field">Телефон<input name="phone" required type="tel" maxlength="20" autocomplete="tel" inputmode="tel" placeholder="+7 900 000-00-00"></label>
+          <label class="form-field">Способ получения<select name="fulfillment" id="fulfillment"><option value="delivery">Курьер · 30–45 минут</option><option value="pickup">Самовывоз · бесплатно</option></select></label>
+          <label class="form-field"><span id="address-caption">Адрес доставки</span><input id="address" name="address" required autocomplete="street-address" placeholder="Улица, дом, квартира"></label>
+          <button class="checkout-button" type="submit">Подтвердить заказ · <span id="checkout-total">${money(cartTotals().total)}</span></button>
+        </form>
+        <p class="form-note">Это демонстрационный магазин: заказ никуда не отправляется и оплата не производится.</p>`;
+      const form = document.querySelector("#checkout-form");
+      const phone = form.elements.namedItem("phone");
+      phone.addEventListener("input", () => {
+        const digits = phone.value.replace(/\D/g, "").length;
+        const charactersAllowed = /^[0-9()+ -]*$/.test(phone.value);
+        phone.setCustomValidity(!phone.value || (charactersAllowed && digits >= 7 && digits <= 15) ? "" : "Укажи телефон с 7–15 цифрами.");
+      });
+      form.elements.namedItem("name").addEventListener("input", event => {
+        event.currentTarget.setCustomValidity(event.currentTarget.value.trim() ? "" : "Укажи имя.");
+      });
+      const address = document.querySelector("#address");
+      address.addEventListener("input", () => address.setCustomValidity(address.value.trim() ? "" : "Укажи адрес."));
+      document.querySelector("#fulfillment").addEventListener("change", event => {
+        const pickup = event.currentTarget.value === "pickup";
+        address.required = !pickup;
+        address.disabled = pickup;
+        address.setCustomValidity("");
+        address.placeholder = pickup ? "Самовывоз из бургерной" : "Улица, дом, квартира";
+        document.querySelector("#address-caption").textContent = pickup ? "Адрес бургерной" : "Адрес доставки";
+        renderCart();
+      });
+      document.querySelector("#close-checkout").addEventListener("click", closeCheckout);
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const name = new FormData(form).get("name").toString().trim();
+        checkoutModal.querySelector(".modal").innerHTML = `<div class="success-state"><div class="success-icon" aria-hidden="true">✓</div><h2 id="success-title"></h2><p>Демо-заказ создан. Настоящий бургер никуда не поедет — это учебный макет.</p><button class="checkout-button" id="finish-order" type="button">Вернуться в меню</button></div>`;
+        document.querySelector("#success-title").textContent = `Спасибо, ${name}!`;
+        document.querySelector("#finish-order").addEventListener("click", () => {
+          cart.clear();
+          renderCart();
+          closeCheckout();
+          closeCart();
+        });
+      });
+    }
+    document.querySelector("#checkout").addEventListener("click", () => {
+      resetCheckoutModal();
+      drawer.setAttribute("aria-hidden", "true");
+      drawer.setAttribute("inert", "");
+      checkoutModal.removeAttribute("inert");
+      checkoutModal.classList.add("open");
+      requestAnimationFrame(() => document.querySelector("#checkout-form [name='name']")?.focus());
+    });
+    checkoutModal.addEventListener("click", event => {
+      if (event.target === checkoutModal) closeCheckout();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        if (checkoutModal.classList.contains("open")) closeCheckout();
+        else if (drawer.classList.contains("open")) closeCart();
+        else if (siteNavigation.classList.contains("open")) {
+          siteNavigation.classList.remove("open");
+          mobileMenuButton.setAttribute("aria-expanded", "false");
+          mobileMenuButton.textContent = "Меню";
+          mobileMenuButton.focus();
+        }
+      }
+      if (event.key === "Tab") {
+        const dialog = checkoutModal.classList.contains("open") ? checkoutModal
+          : drawer.classList.contains("open") ? drawer : null;
+        if (!dialog) return;
+        const focusable = [...dialog.querySelectorAll("button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href]")];
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+    renderProducts();
+    renderCart();
+  </script>
+  <script type="module">
+    const stage = document.querySelector(".hero-art");
+    const canvas = document.querySelector(".hero-3d-canvas");
+
+    try {
+      const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js");
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+      camera.position.set(0, 2.35, 6.15);
+      camera.lookAt(0, 0.02, 0);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.15));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+
+      scene.add(new THREE.HemisphereLight(0xffe9c3, 0x302016, 2.1));
+      const keyLight = new THREE.DirectionalLight(0xffd494, 4.2);
+      keyLight.position.set(-3.8, 6, 5);
+      scene.add(keyLight);
+      const rimLight = new THREE.PointLight(0xff6c32, 36, 9, 2);
+      rimLight.position.set(2.8, 1.2, -2);
+      scene.add(rimLight);
+      const fillLight = new THREE.PointLight(0xd7f36a, 12, 8, 2);
+      fillLight.position.set(-3, -1, 2);
+      scene.add(fillLight);
+
+      const burger = new THREE.Group();
+      burger.scale.setScalar(1.14);
+      scene.add(burger);
+
+      const createFoodTexture = (top, middle, bottom, seed) => {
+        const surface = document.createElement("canvas");
+        surface.width = 512;
+        surface.height = 256;
+        const context = surface.getContext("2d");
+        const gradient = context.createLinearGradient(0, 0, 0, surface.height);
+        gradient.addColorStop(0, top);
+        gradient.addColorStop(.45, middle);
+        gradient.addColorStop(1, bottom);
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, surface.width, surface.height);
+        let randomSeed = seed;
+        const random = () => {
+          randomSeed = (randomSeed * 16807) % 2147483647;
+          return (randomSeed - 1) / 2147483646;
+        };
+        for (let i = 0; i < 4600; i++) {
+          const toasted = random() > .72;
+          context.fillStyle = toasted ? `rgba(96,42,17,${random() * .22})` : `rgba(255,225,157,${random() * .18})`;
+          const size = toasted ? 1 + random() * 4 : .5 + random() * 2;
+          context.beginPath();
+          context.ellipse(random() * surface.width, random() * surface.height, size, size * (.4 + random()), random(), 0, Math.PI * 2);
+          context.fill();
+        }
+        const texture = new THREE.CanvasTexture(surface);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+        return texture;
+      };
+      const bunTexture = createFoodTexture("#f4bd62", "#d98b35", "#9c4f24", 7482);
+      const pattyTexture = createFoodTexture("#9b4a28", "#56271b", "#321710", 8421);
+      const bunMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, map: bunTexture, roughness: .52 });
+      const bunEdgeMaterial = new THREE.MeshStandardMaterial({ color: 0xb46b36, map: bunTexture, roughness: 0.64 });
+      const pattyMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, map: pattyTexture, roughness: 0.78 });
+      const charMaterial = new THREE.MeshStandardMaterial({ color: 0x21130f, roughness: 0.9 });
+      const searedMaterial = new THREE.MeshStandardMaterial({ color: 0x73351f, roughness: 0.86 });
+      const cheeseMaterial = new THREE.MeshStandardMaterial({ color: 0xffc83e, roughness: 0.36, side: THREE.DoubleSide });
+      const lettuceMaterial = new THREE.MeshStandardMaterial({ color: 0x83a92d, roughness: 0.56, side: THREE.DoubleSide });
+      const lettuceLightMaterial = new THREE.MeshStandardMaterial({ color: 0xb5cf45, roughness: 0.55, side: THREE.DoubleSide });
+      const tomatoMaterial = new THREE.MeshStandardMaterial({ color: 0xc83725, roughness: 0.35 });
+      const tomatoCutMaterial = new THREE.MeshStandardMaterial({ color: 0xff7751, roughness: 0.42 });
+      const onionMaterial = new THREE.MeshStandardMaterial({ color: 0xd4a8bf, roughness: 0.3, metalness: 0.05 });
+      const sesameMaterial = new THREE.MeshStandardMaterial({ color: 0xffefbd, roughness: 0.62 });
+      const ingredients = [];
+      const createIngredient = (name, spread, delay, base = [0, 0, 0]) => {
+        const group = new THREE.Group();
+        group.userData.name = name;
+        group.userData.spread = new THREE.Vector3(...spread);
+        group.userData.base = new THREE.Vector3(...base);
+        group.position.copy(group.userData.base);
+        group.userData.delay = delay;
+        group.userData.progress = 0;
+        group.userData.from = 0;
+        group.userData.to = 0;
+        group.userData.startedAt = 0;
+        group.userData.duration = .62;
+        burger.add(group);
+        ingredients.push(group);
+        return group;
+      };
+      const bottomBun = createIngredient("bottom-bun", [0, -.4, 0], 0, [0, .055, 0]);
+      const pattyLayer = createIngredient("double-patty", [0, -.3, .04], .05);
+      const cheeseLayer = createIngredient("double-cheese", [0, -.02, .12], .1);
+      const lettuceLayer = createIngredient("lettuce", [.04, .32, -.02], .15);
+      const tomatoLayer = createIngredient("tomato", [-.08, .61, .06], .2);
+      const pickleLayer = createIngredient("pickles", [.12, .88, -.1], .25);
+      const onionLayer = createIngredient("onion", [.02, 1.16, -.03], .3, [0, .43, 0]);
+      const topBunLayer = createIngredient("top-bun", [0, 1.52, 0], .35, [0, .54, 0]);
+
+      const lathe = (profile, material, y, scaleX = 1, scaleZ = 1, parent = burger) => {
+        const geometry = new THREE.LatheGeometry(profile.map(([radius, height]) => new THREE.Vector2(radius, height)), 96);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.y = y;
+        mesh.scale.set(scaleX, 1, scaleZ);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        parent.add(mesh);
+        return mesh;
+      };
+      const bunProfile = [[0, 0], [.9, 0], [1.02, .035], [1.1, .11], [1.09, .23], [1.02, .36], [.88, .49], [.66, .6], [.39, .68], [0, .71]];
+      const bottomBunProfile = [[0, 0], [.9, 0], [1.03, .035], [1.1, .1], [1.08, .21], [.98, .28], [0, .28]];
+      lathe(bottomBunProfile, bunEdgeMaterial, -.69, 1.08, .88, bottomBun);
+      const pattyProfile = [[0, 0], [1.02, 0], [1.12, .035], [1.13, .13], [1.08, .2], [0, .2]];
+      lathe(pattyProfile, pattyMaterial, -.355, 1.02, .86, pattyLayer);
+      lathe(pattyProfile, pattyMaterial, -.115, .98, .83, pattyLayer);
+      const pattyMarks = [
+        new THREE.InstancedMesh(new THREE.BoxGeometry(.105, .018, .034), charMaterial, 16),
+        new THREE.InstancedMesh(new THREE.BoxGeometry(.085, .016, .028), searedMaterial, 48)
+      ];
+      const markerMatrix = new THREE.Matrix4();
+      const markerRotation = new THREE.Quaternion();
+      const markerScale = new THREE.Vector3(1, 1, 1);
+      let markerIndex = [0, 0];
+      for (let i = 0; i < 32; i++) {
+        const angle = i * 2.39996;
+        const radius = .18 + .86 * Math.sqrt((i + .5) / 32);
+        for (const y of [-.157, .083]) {
+          const groupIndex = i % 4 === 0 ? 0 : 1;
+          const instanceIndex = markerIndex[groupIndex]++;
+          markerRotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+          markerMatrix.compose(
+            new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius * .84),
+            markerRotation,
+            markerScale
+          );
+          pattyMarks[groupIndex].setMatrixAt(instanceIndex, markerMatrix);
+        }
+      }
+      pattyMarks.forEach(marks => {
+        marks.instanceMatrix.needsUpdate = true;
+        marks.computeBoundingSphere();
+        pattyLayer.add(marks);
+      });
+
+      const cheeseShape = new THREE.Shape();
+      cheeseShape.moveTo(-1.1, -.72);
+      cheeseShape.lineTo(1.1, -.72);
+      cheeseShape.lineTo(1.05, -.34);
+      cheeseShape.lineTo(.9, -.24);
+      cheeseShape.lineTo(1.04, -.06);
+      cheeseShape.lineTo(.96, .43);
+      cheeseShape.lineTo(.78, .55);
+      cheeseShape.lineTo(.58, .44);
+      cheeseShape.lineTo(.25, .73);
+      cheeseShape.lineTo(-.08, .55);
+      cheeseShape.lineTo(-.38, .68);
+      cheeseShape.lineTo(-.62, .47);
+      cheeseShape.lineTo(-.92, .55);
+      cheeseShape.lineTo(-1.04, .32);
+      cheeseShape.lineTo(-.95, -.12);
+      cheeseShape.lineTo(-1.08, -.27);
+      cheeseShape.closePath();
+      const cheese = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(cheeseShape, { depth: .055, bevelEnabled: true, bevelSegments: 2, bevelSize: .035, bevelThickness: .025 }),
+        cheeseMaterial
+      );
+      cheese.rotation.x = -Math.PI / 2;
+      cheese.castShadow = true;
+      const upperCheese = cheese.clone();
+      for (const [slice, y] of [[cheese, -.14], [upperCheese, .105]]) {
+        slice.position.y = y;
+        cheeseLayer.add(slice);
+      }
+
+      const makeLettuce = (phase, material, scale) => {
+        const positions = [];
+        const indices = [];
+        const rings = 9;
+        const segments = 96;
+        for (let ring = 0; ring <= rings; ring++) {
+          const radius = ring / rings;
+          for (let segment = 0; segment < segments; segment++) {
+            const angle = (segment / segments) * Math.PI * 2;
+            const frill = Math.sin(angle * 9 + phase) * .105 * radius + Math.sin(angle * 15 - phase) * .035 * radius;
+            const edgeRadius = .98 * scale + frill;
+            positions.push(
+              Math.cos(angle) * radius * edgeRadius,
+              Math.sin(angle * 7 + phase) * .025 * radius + frill * .42,
+              Math.sin(angle) * radius * edgeRadius * .8
+            );
+            if (ring < rings) {
+              const current = ring * segments + segment;
+              const next = ring * segments + (segment + 1) % segments;
+              indices.push(current, next, current + segments, next, next + segments, current + segments);
+            }
+          }
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setIndex(indices);
+        geometry.computeVertexNormals();
+        const leaf = new THREE.Mesh(geometry, material);
+        leaf.position.y = .18 + phase * .012;
+        leaf.rotation.y = phase;
+        leaf.castShadow = true;
+        lettuceLayer.add(leaf);
+      };
+      makeLettuce(.3, lettuceMaterial, 1);
+      makeLettuce(2.5, lettuceLightMaterial, .9);
+
+      const tomatoGeometry = new THREE.CylinderGeometry(.42, .42, .11, 48);
+      const tomatoRimGeometry = new THREE.TorusGeometry(.355, .022, 8, 40);
+      const seedGeometry = new THREE.SphereGeometry(.025, 8, 6);
+      for (const [x, z] of [[-.39, -.18], [.39, .14]]) {
+        const slice = new THREE.Group();
+        const body = new THREE.Mesh(tomatoGeometry, tomatoMaterial);
+        body.castShadow = true;
+        slice.add(body);
+        const rim = new THREE.Mesh(tomatoRimGeometry, tomatoCutMaterial);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.y = .058;
+        slice.add(rim);
+        for (let seed = 0; seed < 7; seed++) {
+          const angle = seed * (Math.PI * 2 / 7);
+          const pit = new THREE.Mesh(seedGeometry, sesameMaterial);
+          pit.scale.set(.65, .35, 1.4);
+          pit.position.set(Math.cos(angle) * .18, .06, Math.sin(angle) * .18);
+          slice.add(pit);
+        }
+        slice.position.set(x, .3, z);
+        slice.rotation.y = x;
+        tomatoLayer.add(slice);
+      }
+
+      const pickles = new THREE.Group();
+      const pickleSkin = new THREE.MeshStandardMaterial({ color: 0x637c2d, roughness: .55 });
+      const pickleCut = new THREE.MeshStandardMaterial({ color: 0xb1c956, roughness: .62 });
+      for (const [x, z, rotation] of [[-.55, -.18, -.28], [.02, .12, .2], [.55, -.12, -.18]]) {
+        const pickle = new THREE.Group();
+        const slice = new THREE.Mesh(new THREE.CylinderGeometry(.15, .15, .065, 24), pickleSkin);
+        slice.castShadow = true;
+        pickle.add(slice);
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(.118, .018, 8, 24), pickleCut);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.y = .035;
+        pickle.add(rim);
+        for (let seed = 0; seed < 4; seed++) {
+          const angle = seed * Math.PI / 2;
+          const pit = new THREE.Mesh(new THREE.SphereGeometry(.015, 6, 5), sesameMaterial);
+          pit.scale.set(.7, .35, 1);
+          pit.position.set(Math.cos(angle) * .055, .04, Math.sin(angle) * .055);
+          pickle.add(pit);
+        }
+        pickle.position.set(x, .38, z);
+        pickle.rotation.y = rotation;
+        pickles.add(pickle);
+      }
+      pickleLayer.add(pickles);
+
+      const onion = new THREE.Group();
+      for (const [radius, tube, x, z, rotation] of [[.72, .055, -.12, 0, .12], [.54, .04, .27, .04, -.23], [.36, .032, -.42, .05, .38]]) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 12, 72), onionMaterial);
+        ring.rotation.x = Math.PI / 2;
+        ring.rotation.z = rotation;
+        ring.position.set(x, .045, z);
+        ring.castShadow = true;
+        onion.add(ring);
+      }
+      onion.position.y = .045;
+      onionLayer.add(onion);
+
+      const upperBun = topBunLayer;
+      const upperMesh = new THREE.Mesh(new THREE.LatheGeometry(bunProfile.map(([radius, height]) => new THREE.Vector2(radius, height)), 96), bunMaterial);
+      upperMesh.scale.set(1.08, 1, .88);
+      upperMesh.castShadow = true;
+      upperMesh.receiveShadow = true;
+      upperBun.add(upperMesh);
+
+      const sesameSeeds = new THREE.InstancedMesh(new THREE.SphereGeometry(.045, 8, 6), sesameMaterial, 38);
+      const seedMatrix = new THREE.Matrix4();
+      const seedRotation = new THREE.Quaternion();
+      const seedScale = new THREE.Vector3(.82, .3, 1.55);
+      const topSurfaceHeight = radius => {
+        let height = 0;
+        for (let i = 1; i < bunProfile.length; i++) {
+          const [startRadius, startHeight] = bunProfile[i - 1];
+          const [endRadius, endHeight] = bunProfile[i];
+          if (radius < Math.min(startRadius, endRadius) || radius > Math.max(startRadius, endRadius)) continue;
+          const progress = (radius - startRadius) / (endRadius - startRadius);
+          height = Math.max(height, startHeight + (endHeight - startHeight) * progress);
+        }
+        return height;
+      };
+      for (let i = 0; i < 38; i++) {
+        const angle = i * 2.39996;
+        const radius = .12 + .81 * Math.sqrt((i + .5) / 38);
+        const height = topSurfaceHeight(radius) + .01;
+        seedRotation.setFromEuler(new THREE.Euler(-Math.cos(angle) * .2, angle, Math.sin(angle) * .2));
+        seedMatrix.compose(
+          new THREE.Vector3(Math.cos(angle) * radius * 1.08, height, Math.sin(angle) * radius * .88),
+          seedRotation,
+          seedScale
+        );
+        sesameSeeds.setMatrixAt(i, seedMatrix);
+      }
+      sesameSeeds.instanceMatrix.needsUpdate = true;
+      sesameSeeds.computeBoundingSphere();
+      upperBun.add(sesameSeeds);
+
+      const shadow = new THREE.Mesh(
+        new THREE.CircleGeometry(1.48, 64),
+        new THREE.MeshBasicMaterial({ color: 0x090604, transparent: true, opacity: .38, depthWrite: false })
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.set(0, -1.02, 0);
+      shadow.scale.set(1, .58, 1);
+      burger.add(shadow);
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const clock = new THREE.Clock();
+      const isCompactViewport = () => window.matchMedia("(max-width: 600px)").matches;
+      let frame = 0;
+      let exploded = stage.classList.contains("exploded");
+      let cameraDistance = exploded ? (isCompactViewport() ? 12.2 : 10) : (isCompactViewport() ? 7.2 : 6.15);
+      let cameraTargetY = exploded ? .65 : .02;
+      let cameraLookY = cameraTargetY;
+      const userRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(-.06, 0, 0));
+      const smoothRotation = userRotation.clone();
+      const rotationDelta = new THREE.Quaternion();
+      const worldUp = new THREE.Vector3(0, 1, 0);
+      const idleEuler = new THREE.Euler();
+      const idleRotation = new THREE.Quaternion();
+      const rotationAxis = new THREE.Vector3();
+      const cameraForward = new THREE.Vector3();
+      let activePointer = null;
+      let pointerStartX = 0;
+      let pointerStartY = 0;
+      let previousPointerX = 0;
+      let previousPointerY = 0;
+      let previousPointerTime = 0;
+      let pointerMoved = false;
+      let angularVelocityX = 0;
+      let angularVelocityY = 0;
+      let frameInterval = isCompactViewport() ? 1000 / 30 : 1000 / 48;
+      const resize = () => {
+        const bounds = stage.getBoundingClientRect();
+        if (!bounds.width || !bounds.height) return;
+        const compact = isCompactViewport();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 0.85 : 1));
+        renderer.setSize(bounds.width, bounds.height, false);
+        camera.aspect = bounds.width / bounds.height;
+        frameInterval = compact ? 1000 / 30 : 1000 / 48;
+        cameraDistance = exploded
+          ? (compact ? 12.2 : 10)
+          : (compact ? 7.2 : 6.15);
+        camera.updateProjectionMatrix();
+      };
+      window.addEventListener("resize", resize, { passive: true });
+      const resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(stage);
+      resize();
+      stage.classList.add("webgl-ready");
+
+      if (exploded) {
+        ingredients.forEach(layer => {
+          layer.userData.progress = 1;
+          layer.position.copy(layer.userData.base).add(layer.userData.spread);
+        });
+      }
+      const onExplode = event => {
+        exploded = event.detail.exploded;
+        const now = clock.getElapsedTime();
+        ingredients.forEach(layer => {
+          const data = layer.userData;
+          data.from = data.progress;
+          data.to = exploded ? 1 : 0;
+          data.startedAt = now + (exploded ? data.delay : .35 - data.delay);
+          if (reducedMotion.matches) {
+            data.progress = data.to;
+            layer.position.copy(data.base).addScaledVector(data.spread, data.progress);
+          }
+        });
+        cameraDistance = exploded ? (isCompactViewport() ? 12.2 : 10) : (isCompactViewport() ? 7.2 : 6.15);
+        cameraTargetY = exploded ? .65 : .02;
+        if (reducedMotion.matches) {
+          camera.position.z = cameraDistance;
+          cameraLookY = cameraTargetY;
+          camera.lookAt(0, cameraLookY, 0);
+        }
+        requestRender();
+      };
+      stage.addEventListener("burger:explode", onExplode);
+      const dragTarget = document.querySelector(".hero-drag-target");
+      const rotateBy = (deltaX, deltaY, elapsed) => {
+        const rotationX = deltaX * .009;
+        const rotationY = deltaY * .009;
+        rotationDelta.setFromAxisAngle(worldUp, rotationX);
+        userRotation.premultiply(rotationDelta);
+        camera.getWorldDirection(cameraForward);
+        rotationAxis.crossVectors(camera.up, cameraForward).normalize();
+        rotationDelta.setFromAxisAngle(rotationAxis, rotationY);
+        userRotation.premultiply(rotationDelta);
+        angularVelocityX = THREE.MathUtils.clamp(rotationX / elapsed, -8, 8);
+        angularVelocityY = THREE.MathUtils.clamp(rotationY / elapsed, -8, 8);
+        if (reducedMotion.matches) smoothRotation.copy(userRotation);
+        requestRender();
+      };
+      dragTarget.addEventListener("keydown", event => {
+        const directions = {
+          ArrowLeft: [-28, 0],
+          ArrowRight: [28, 0],
+          ArrowUp: [0, -28],
+          ArrowDown: [0, 28]
+        };
+        const direction = directions[event.key];
+        if (!direction) return;
+        event.preventDefault();
+        rotateBy(direction[0], direction[1], .12);
+      });
+      dragTarget.addEventListener("pointerdown", event => {
+        if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+        event.preventDefault();
+        activePointer = event.pointerId;
+        pointerStartX = previousPointerX = event.clientX;
+        pointerStartY = previousPointerY = event.clientY;
+        previousPointerTime = performance.now();
+        pointerMoved = false;
+        angularVelocityX = 0;
+        angularVelocityY = 0;
+        dragTarget.setPointerCapture(event.pointerId);
+        stage.classList.add("is-dragging");
+      });
+      dragTarget.addEventListener("pointermove", event => {
+        if (event.pointerId !== activePointer) return;
+        const deltaX = event.clientX - previousPointerX;
+        const deltaY = event.clientY - previousPointerY;
+        const distanceX = event.clientX - pointerStartX;
+        const distanceY = event.clientY - pointerStartY;
+        if (Math.hypot(distanceX, distanceY) > 5) pointerMoved = true;
+        if (!pointerMoved) return;
+        const now = performance.now();
+        const elapsed = Math.max((now - previousPointerTime) / 1000, .008);
+        rotateBy(deltaX, deltaY, elapsed);
+        previousPointerX = event.clientX;
+        previousPointerY = event.clientY;
+        previousPointerTime = now;
+      });
+      const finishDrag = (event, cancelled = false) => {
+        if (event.pointerId !== activePointer) return;
+        const shouldToggle = !cancelled && !pointerMoved;
+        activePointer = null;
+        stage.classList.remove("is-dragging");
+        if (shouldToggle) toggleBurgerExplosion();
+        else requestRender();
+      };
+      dragTarget.addEventListener("pointerup", event => finishDrag(event));
+      dragTarget.addEventListener("pointercancel", event => finishDrag(event, true));
+      dragTarget.addEventListener("lostpointercapture", event => finishDrag(event, true));
+      dragTarget.addEventListener("click", event => {
+        if (event.detail === 0) toggleBurgerExplosion();
+      });
+      let lastFrameTime = clock.getElapsedTime();
+      let lastRenderAt = 0;
+      const animate = timestamp => {
+        frame = 0;
+        if (!reducedMotion.matches && timestamp - lastRenderAt < frameInterval) {
+          frame = window.requestAnimationFrame(animate);
+          return;
+        }
+        lastRenderAt = timestamp;
+        const time = clock.getElapsedTime();
+        const delta = Math.min(time - lastFrameTime, .05);
+        lastFrameTime = time;
+        let layersMoving = false;
+        ingredients.forEach((layer, index) => {
+          const data = layer.userData;
+          if (time >= data.startedAt && data.progress !== data.to) {
+            const progress = Math.min((time - data.startedAt) / data.duration, 1);
+            const eased = progress * progress * (3 - 2 * progress);
+            data.progress = data.from + (data.to - data.from) * eased;
+            if (progress < 1) layersMoving = true;
+          } else if (data.progress !== data.to) {
+            layersMoving = true;
+          }
+          layer.position.copy(data.base).addScaledVector(data.spread, data.progress);
+          layer.rotation.z = Math.sin(data.progress * Math.PI) * (index % 2 ? -.11 : .11);
+        });
+        if (!activePointer && !reducedMotion.matches) {
+          if (Math.abs(angularVelocityX) > .015 || Math.abs(angularVelocityY) > .015) {
+            rotationDelta.setFromAxisAngle(worldUp, angularVelocityX * delta);
+            userRotation.premultiply(rotationDelta);
+            camera.getWorldDirection(cameraForward);
+            rotationAxis.crossVectors(camera.up, cameraForward).normalize();
+            rotationDelta.setFromAxisAngle(rotationAxis, angularVelocityY * delta);
+            userRotation.premultiply(rotationDelta);
+            const friction = Math.exp(-4.2 * delta);
+            angularVelocityX *= friction;
+            angularVelocityY *= friction;
+          }
+        } else if (reducedMotion.matches) {
+          angularVelocityX = 0;
+          angularVelocityY = 0;
+        }
+        if (reducedMotion.matches) smoothRotation.copy(userRotation);
+        else smoothRotation.slerp(userRotation, 1 - Math.exp(-19 * delta));
+        camera.position.z = THREE.MathUtils.damp(camera.position.z, cameraDistance, 3.5, delta);
+        cameraLookY = THREE.MathUtils.damp(cameraLookY, cameraTargetY, 3.5, delta);
+        camera.lookAt(0, cameraLookY, 0);
+        burger.quaternion.copy(smoothRotation);
+        if (!reducedMotion.matches) {
+          burger.position.y = exploded ? 0 : Math.sin(time * 1.15) * .085;
+          idleEuler.set(-.035, Math.sin(time * .42) * (exploded ? .02 : .04), Math.sin(time * .62) * .016);
+          idleRotation.setFromEuler(idleEuler);
+          burger.quaternion.multiply(idleRotation);
+        } else {
+          burger.position.y = 0;
+        }
+        renderer.render(scene, camera);
+        if (!reducedMotion.matches || layersMoving) frame = window.requestAnimationFrame(animate);
+      };
+      const requestRender = () => {
+        if (!frame) frame = window.requestAnimationFrame(animate);
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (frame) window.cancelAnimationFrame(frame);
+          frame = 0;
+        } else requestRender();
+      });
+      reducedMotion.addEventListener("change", requestRender);
+      requestRender();
+    } catch (error) {
+      console.error("Не удалось запустить 3D-модель; показана резервная CSS-модель.", error);
+    }
+  </script>
+</body>
+</html>
