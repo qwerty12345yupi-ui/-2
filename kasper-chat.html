@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Бесплатный чат с Каспером — ИИ-помощником на каждый день.">
+  <title>Каспер — ИИ-чат</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%2314161d'/%3E%3Cpath d='M19 45V19h7v12l12-12h9L33 33l15 12H38L26 34v11z' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      color: #f5f5f7;
+      background: #08090c;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      --muted: #90929c;
+      --line: rgba(255,255,255,.1);
+      --panel: rgba(15,16,21,.84);
+      --accent: #c5b8ff;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; min-height: 100dvh; margin: 0; background: #08090c; }
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .ambient {
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% -18%, rgba(136,113,226,.22), transparent 52%),
+        radial-gradient(ellipse at 93% 77%, rgba(69,87,135,.09), transparent 34%),
+        #08090c;
+    }
+    .ambient::after {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 65%);
+      content: "";
+    }
+    .shell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      width: min(100%, 1120px);
+      min-height: 100vh;
+      min-height: 100dvh;
+      flex-direction: column;
+      margin: 0 auto;
+      padding: 0 30px;
+    }
+    .topbar {
+      display: flex;
+      min-height: 78px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgba(222,215,255,.26);
+      border-radius: 13px;
+      background: linear-gradient(145deg, rgba(204,192,255,.18), rgba(91,78,142,.08));
+      color: #e8e1ff;
+      font-family: "Manrope", sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: inset 0 1px rgba(255,255,255,.12), 0 5px 24px rgba(128,105,211,.12);
+    }
+    .brand-name { font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 800; letter-spacing: -.04em; }
+    .brand-name span { color: #c9bdff; }
+    .brand-caption { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .free-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border: 1px solid rgba(153,224,185,.19);
+      border-radius: 999px;
+      color: #b6e9c9;
+      background: rgba(71,141,98,.1);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .free-badge::before { width: 6px; height: 6px; border-radius: 50%; background: #81dba3; content: ""; box-shadow: 0 0 10px rgba(129,219,163,.6); }
+    .new-chat {
+      display: inline-flex;
+      min-height: 39px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.045);
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+    }
+    .new-chat:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
+    .main { display: flex; flex: 1; flex-direction: column; }
+    .conversation {
+      display: flex;
+      width: min(100%, 790px);
+      flex: 1;
+      flex-direction: column;
+      margin: 0 auto;
+    }
+    .messages {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 24px;
+      overflow: auto;
+      padding: 32px 8px 22px;
+      scrollbar-color: rgba(255,255,255,.19) transparent;
+      scrollbar-width: thin;
+    }
+    .welcome { margin: auto 0; padding: 40px 0 32px; text-align: center; }
+    .welcome-mark {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      margin: 0 auto 21px;
+      border: 1px solid rgba(216,207,255,.25);
+      border-radius: 19px;
+      color: #e1d8ff;
+      background: linear-gradient(145deg, rgba(203,191,255,.17), rgba(78,69,126,.08));
+      font-family: "Manrope", sans-serif;
+      font-size: 25px;
+      font-weight: 800;
+      box-shadow: 0 10px 45px rgba(131,108,220,.13);
+    }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(30px, 5vw, 44px); font-weight: 700; letter-spacing: -.055em; line-height: 1.15; }
+    .welcome p { max-width: 490px; margin: 13px auto 0; color: #a4a5af; font-size: 15px; line-height: 1.65; }
+    .suggestions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; max-width: 630px; margin: 28px auto 0; }
+    .suggestion {
+      min-height: 52px;
+      padding: 12px 15px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      color: #dedee4;
+      background: rgba(255,255,255,.035);
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: left;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .suggestion:hover { transform: translateY(-1px); border-color: rgba(205,192,255,.36); background: rgba(196,181,253,.08); }
+    .message { display: grid; grid-template-columns: 34px minmax(0,1fr); align-items: start; gap: 12px; animation: appear .2s ease both; }
+    .message--user { grid-template-columns: minmax(0,1fr) 34px; }
+    .message-avatar {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 11px;
+      color: #e4dcff;
+      background: rgba(255,255,255,.07);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .message--user .message-avatar { grid-column: 2; color: #c6c8d1; background: rgba(255,255,255,.055); }
+    .message-content { min-width: 0; padding-top: 2px; }
+    .message--user .message-content { grid-column: 1; grid-row: 1; justify-self: end; max-width: min(88%, 600px); padding: 10px 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 15px 4px 15px 15px; background: rgba(255,255,255,.075); }
+    .message-label { margin-bottom: 5px; color: #aaaab4; font-size: 12px; font-weight: 600; }
+    .message-text { color: #e6e6eb; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .message--user .message-label { display: none; }
+    .message--user .message-text { color: #f0eff4; }
+    .message--error .message-text { color: #ffc0c0; }
+    .thinking { display: inline-flex; align-items: center; gap: 5px; min-height: 22px; }
+    .thinking span { width: 6px; height: 6px; border-radius: 50%; background: #c7baff; animation: pulse 1s infinite ease-in-out; }
+    .thinking span:nth-child(2) { animation-delay: .15s; }
+    .thinking span:nth-child(3) { animation-delay: .3s; }
+    .message-status { margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .composer-wrap { padding: 10px 0 22px; }
+    .composer {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 11px 12px 11px 17px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 17px;
+      background: rgba(20,21,27,.88);
+      box-shadow: 0 14px 50px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.04);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .composer:focus-within { border-color: rgba(200,187,255,.44); box-shadow: 0 0 0 3px rgba(180,162,255,.06), 0 14px 50px rgba(0,0,0,.28); }
+    textarea {
+      width: 100%;
+      min-height: 27px;
+      max-height: 180px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      color: #f4f3f8;
+      background: transparent;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    textarea::placeholder { color: #858691; }
+    .send {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 0;
+      border-radius: 12px;
+      color: #17141f;
+      background: #ded5ff;
+      cursor: pointer;
+      transition: transform .18s, background .18s, opacity .18s;
+    }
+    .send:hover:not(:disabled) { transform: translateY(-1px); background: #eee9ff; }
+    .send:disabled { opacity: .42; cursor: default; }
+    .send svg { width: 18px; height: 18px; }
+    .composer-meta { display: flex; justify-content: space-between; gap: 12px; padding: 8px 4px 0; color: #777984; font-size: 11px; line-height: 1.5; }
+    .footer-note { padding: 0 0 17px; color: #72737d; font-size: 11px; line-height: 1.55; text-align: center; }
+    .footer-note a { color: #b7aaff; text-decoration: underline; text-underline-offset: 3px; }
+    [hidden] { display: none !important; }
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    @keyframes pulse { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+    @media (min-height: 850px) { .messages { padding-top: 48px; } }
+    @media (max-width: 640px) {
+      .shell { padding: 0 16px; }
+      .topbar { min-height: 68px; }
+      .brand-mark { width: 35px; height: 35px; }
+      .brand-caption { font-size: 10px; }
+      .topbar-actions { gap: 8px; }
+      .free-badge { gap: 6px; padding: 7px 9px; font-size: 11px; }
+      .new-chat { width: 39px; min-height: 39px; justify-content: center; padding: 0; font-size: 0; }
+      .new-chat svg { width: 17px; height: 17px; }
+      .messages { padding: 18px 0; }
+      .welcome { padding: 25px 0; }
+      .welcome p { font-size: 14px; }
+      .suggestions { grid-template-columns: 1fr; margin-top: 22px; }
+      .suggestion { min-height: 46px; }
+      .message { gap: 9px; }
+      .message-text { font-size: 13.5px; }
+      .composer-wrap { padding-bottom: 14px; }
+      .composer-meta { font-size: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    :root {
+      color-scheme: dark;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      background: #000;
+      --muted: #a7a7a7;
+      --line: rgba(255,255,255,.18);
+      --accent: #ddd;
+    }
+    body { background: #000; color: #fff; font-family: inherit; }
+    .ambient { background: rgba(0,0,0,.62); }
+    .ambient::after {
+      background-image: repeating-linear-gradient(0deg, #fff0 0 2px, #ffffff07 3px, #fff0 4px);
+      background-size: auto;
+      mask-image: none;
+      opacity: .16;
+    }
+    .shell { width: min(100%, 1600px); padding-inline: clamp(20px, 4vw, 64px); }
+    .topbar { min-height: 74px; border-bottom-color: rgba(255,255,255,.13); }
+    .brand { gap: 9px; }
+    .brand-mark, .welcome-mark, .message-avatar {
+      border: 1px solid rgba(220,220,220,.35);
+      border-radius: 7px;
+      color: #fff;
+      background: linear-gradient(105deg, #050505 0%, #292929 48%, #484848 100%);
+      box-shadow: inset 0 1px rgba(255,255,255,.2);
+      font-family: inherit;
+      font-weight: 600;
+    }
+    .brand-mark { width: 34px; height: 34px; font-size: 17px; }
+    .brand-name { font-family: inherit; font-size: 15.5px; font-weight: 600; letter-spacing: -.03em; }
+    .brand-name span { color: inherit; font-weight: 400; }
+    .brand-caption { color: #b6b6b6; }
+    .topbar-actions { gap: 10px; }
+    .free-badge, .new-chat, .suggestion, .composer {
+      border: 1px solid rgba(198,198,198,.45);
+      border-radius: 7px;
+      color: #f3f3f3;
+      background: linear-gradient(105deg, rgba(5,5,5,.88) 0%, rgba(42,42,42,.8) 48%, rgba(74,74,74,.72) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.09);
+    }
+    .free-badge { gap: 8px; border-color: rgba(198,198,198,.3); color: #eee; background: rgba(20,20,20,.62); }
+    .free-badge::before { background: #d7d7d7; box-shadow: 0 0 10px rgba(255,255,255,.45); }
+    .new-chat { min-height: 40px; padding-inline: 14px; font-size: 13px; }
+    .new-chat:hover, .suggestion:hover { border-color: rgba(245,245,245,.82); background: linear-gradient(105deg, #111 0%, #3a3a3a 45%, #626262 100%); }
+    .conversation { width: min(100%, 950px); }
+    .messages { scrollbar-color: rgba(255,255,255,.34) transparent; }
+    .welcome-mark {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      font-size: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 0 26px rgba(255,255,255,.08);
+    }
+    h1 { font-family: inherit; font-size: clamp(34px, 4vw, 48px); font-weight: 500; letter-spacing: -.05em; }
+    .welcome p { color: #c2c2c2; }
+    .suggestions { max-width: 700px; }
+    .suggestion { min-height: 48px; color: #eee; background: rgba(12,12,12,.63); backdrop-filter: blur(12px); }
+    .message-avatar { color: #fff; }
+    .message--user .message-avatar { color: #fff; background: linear-gradient(105deg, #191919 0%, #343434 50%, #515151 100%); }
+    .message-label { color: #c8c8c8; }
+    .message-text { color: #f1f1f1; }
+    .message--user .message-content {
+      border-color: rgba(255,255,255,.16);
+      border-radius: 7px;
+      background: linear-gradient(105deg, rgba(18,18,18,.86), rgba(56,56,56,.65));
+    }
+    .composer {
+      padding: 11px 12px 11px 17px;
+      border-color: rgba(198,198,198,.56);
+      border-radius: 8px;
+      background: linear-gradient(115deg, rgba(7,7,7,.92), rgba(38,38,38,.88) 55%, rgba(61,61,61,.8));
+      backdrop-filter: blur(16px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 12px 34px rgba(0,0,0,.32);
+    }
+    .composer:focus-within { border-color: rgba(245,245,245,.83); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 22px rgba(210,210,210,.13); }
+    textarea { color: #fff; font-family: inherit; }
+    textarea::placeholder { color: #b2b2b2; }
+    .send {
+      border: 1px solid #fff;
+      border-radius: 6px;
+      color: #111;
+      background: linear-gradient(180deg, #fff 0%, #e7e7e7 48%, #cfcfcf 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+    }
+    .send:hover:not(:disabled) { background: linear-gradient(180deg, #fff 0%, #f3f3f3 42%, #d5d5d5 100%); box-shadow: inset 0 1px 0 #fff, 0 0 22px rgba(235,235,235,.25), 0 8px 18px rgba(255,255,255,.1); }
+    .composer-meta, .footer-note, .message-status { color: #a5a5a5; }
+    .footer-note a { color: #e5e5e5; }
+    @media (max-width: 640px) {
+      .shell { padding-inline: 16px; }
+      .topbar { min-height: 68px; }
+      .brand-caption { font-size: 10px; }
+      .new-chat { border-radius: 6px; }
+      .welcome { padding-block: 28px; }
+      h1 { font-size: 34px; }
+      .suggestion { border-radius: 7px; }
+    }
+    .workspace {
+      position: relative;
+      display: grid;
+      min-height: 0;
+      flex: 1;
+      grid-template-columns: 248px minmax(0,1fr);
+      gap: 24px;
+    }
+    .main { min-width: 0; min-height: 0; }
+    .chat-sidebar {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      gap: 14px;
+      padding: 22px 16px 18px 0;
+      border-right: 1px solid rgba(255,255,255,.16);
+    }
+    .sidebar-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sidebar-heading h2 { font-size: 13px; font-weight: 600; letter-spacing: .01em; }
+    .sidebar-create {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid rgba(198,198,198,.45);
+      border-radius: 7px;
+      background: linear-gradient(105deg,#050505 0%,#292929 48%,#484848 100%);
+      cursor: pointer;
+    }
+    .sidebar-create:hover, .chat-delete:hover { border-color: rgba(245,245,245,.8); background: #373737; }
+    .sidebar-create svg, .chat-delete svg { width: 16px; height: 16px; }
+    .chat-list { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 6px; overflow: auto; padding-right: 4px; scrollbar-color: rgba(255,255,255,.28) transparent; scrollbar-width: thin; }
+    .chat-row { display: grid; min-width: 0; grid-template-columns: minmax(0,1fr) 30px; gap: 4px; align-items: center; }
+    .chat-select {
+      min-width: 0;
+      padding: 10px 9px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #dedee4;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+    .chat-select:hover { background: rgba(255,255,255,.07); }
+    .chat-select[aria-current="true"] { border-color: rgba(198,198,198,.4); color: #fff; background: linear-gradient(105deg,rgba(25,25,25,.85),rgba(66,66,66,.62)); }
+    .chat-title, .chat-preview { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chat-title { font-size: 12px; font-weight: 500; }
+    .chat-preview { margin-top: 4px; color: #999; font-size: 10px; }
+    .chat-delete { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid transparent; border-radius: 6px; color: #aaa; background: transparent; cursor: pointer; }
+    .chat-delete:hover { color: #fff; }
+    .sidebar-empty { padding: 8px 2px; color: #a5a5a5; font-size: 11px; line-height: 1.5; }
+    .storage-notice { color: #ffc1a8; font-size: 11px; line-height: 1.5; }
+    .conversation { width: min(100%,950px); min-height: 0; margin: 0; }
+    .toggle-history { display: none; }
+    .message--pending .message-status { color: #d0d0d0; }
+    .model-toolbar { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 8px; }
+    .model-picker { display: inline-flex; min-width: 0; align-items: center; gap: 9px; color: #bcbcbc; font-size: 11px; }
+    .model-picker select {
+      width: min(320px,58vw);
+      min-width: 0;
+      padding: 7px 28px 7px 10px;
+      border: 1px solid rgba(198,198,198,.4);
+      border-radius: 6px;
+      color: #f3f3f3;
+      background: rgba(16,16,16,.9);
+      font: inherit;
+      cursor: pointer;
+    }
+    .model-picker select:disabled { opacity: .65; cursor: wait; }
+    .model-picker option { color: #fff; background: #161616; }
+    .model-status { min-width: 0; overflow: hidden; color: #aaa; font-size: 10px; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 640px) {
+      .topbar-actions { gap: 6px; }
+      .model-toolbar { justify-content: flex-start; }
+      .model-picker select { width: min(260px,58vw); }
+      .model-status { display: none; }
+      .new-chat { width: 39px; padding: 0; font-size: 0; }
+      .toggle-history {
+        display: grid;
+        width: 38px;
+        height: 39px;
+        place-items: center;
+        border: 1px solid rgba(198,198,198,.45);
+        border-radius: 6px;
+        background: linear-gradient(105deg,#050505 0%,#292929 48%,#484848 100%);
+        cursor: pointer;
+      }
+      .toggle-history svg { width: 17px; height: 17px; }
+      .workspace { grid-template-columns: minmax(0,1fr); gap: 0; }
+      .chat-sidebar {
+        position: absolute;
+        z-index: 5;
+        top: 8px;
+        bottom: 8px;
+        left: 0;
+        display: none;
+        width: min(310px,calc(100% - 8px));
+        max-height: min(68dvh,560px);
+        padding: 16px;
+        border: 1px solid rgba(198,198,198,.5);
+        border-radius: 8px;
+        background: rgba(8,8,8,.97);
+        box-shadow: 0 18px 50px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.08);
+        backdrop-filter: blur(20px);
+      }
+      .workspace.history-open .chat-sidebar { display: flex; }
+      .sidebar-create { width: 38px; height: 38px; }
+      .chat-select { padding-block: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-photo { display: none; }
+    }
+    html { min-width: 320px; min-height: 100%; }
+    body { overflow-x: clip; }
+    .shell {
+      width: min(100%, 1600px);
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .workspace, .main, .conversation, .messages { min-height: 0; }
+    .composer:focus-within {
+      border-color: rgba(245,245,245,.72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 12px 34px rgba(0,0,0,.32);
+    }
+    textarea {
+      display: block;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      outline: none;
+      box-shadow: none;
+      appearance: none;
+    }
+    textarea:focus-visible { outline: none; }
+    .hero-photo { will-change: auto; }
+    @media (min-width: 641px) and (max-width: 900px) {
+      .shell { padding-inline: 24px; }
+      .workspace { grid-template-columns: 210px minmax(0,1fr); gap: 18px; }
+      .chat-sidebar { padding-right: 12px; }
+      .conversation { width: 100%; }
+    }
+    @media (max-width: 640px) {
+      .shell { padding-inline: 16px; }
+      .hero-photo { display: none; }
+      .composer-wrap { padding-top: 8px; padding-bottom: 10px; }
+      .composer { gap: 8px; padding: 10px 10px 10px 13px; }
+      .send { width: 42px; height: 42px; }
+      .new-chat, .toggle-history { min-height: 42px; }
+      .sidebar-create { width: 42px; height: 42px; }
+      .chat-delete { width: 38px; height: 38px; }
+      .chat-row { grid-template-columns: minmax(0,1fr) 38px; }
+      .chat-select { min-height: 44px; }
+      .messages { overscroll-behavior: contain; }
+    }
+    @media (max-height: 620px) {
+      .topbar { min-height: 60px; }
+      .messages { padding-top: 14px; padding-bottom: 14px; }
+      .welcome { padding-block: 16px; }
+      .welcome-mark { width: 42px; height: 42px; margin-bottom: 12px; }
+      h1 { font-size: clamp(28px, 4vw, 38px); }
+      .welcome p { margin-top: 8px; }
+      .suggestions { gap: 7px; margin-top: 14px; }
+      .suggestion { min-height: 42px; padding-block: 9px; }
+      .composer-wrap { padding-bottom: 8px; }
+      .footer-note { padding-bottom: 8px; }
+    }
+  </style>
+</head>
+<body style="background:#000;color:#fff">
+  <video class="hero-photo" muted loop playsinline preload="none" aria-hidden="true" style="position:fixed;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none">
+    <source data-src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260818_072341_50851634-bbc3-4c33-9acc-7647d4db44aa.mp4" type="video/mp4">
+  </video>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="./kasper.html" aria-label="Вернуться на главную страницу Каспера">
+        <span class="brand-mark" aria-hidden="true">К</span>
+        <span><span class="brand-name">Каспер</span><span class="brand-caption">Твой помощник на каждый день</span></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="free-badge">Бесплатно</span>
+        <button class="toggle-history" id="toggle-history" type="button" aria-label="Показать чаты" aria-expanded="false">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="new-chat" id="new-chat" type="button" aria-label="Начать новый чат">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Новый чат
+        </button>
+      </div>
+    </header>
+    <div class="workspace" id="workspace">
+      <aside class="chat-sidebar" aria-label="История чатов">
+        <div class="sidebar-heading">
+          <h2>Мои чаты</h2>
+          <button class="sidebar-create" id="sidebar-new-chat" type="button" aria-label="Создать чат">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="chat-list" id="chat-list" role="list"></div>
+        <p class="storage-notice" id="storage-notice" role="status" hidden></p>
+      </aside>
+      <main class="main">
+        <section class="conversation" aria-label="Чат с Каспером">
+          <div class="messages" id="messages" aria-live="polite" aria-relevant="additions text">
+            <div class="welcome" id="welcome">
+              <div class="welcome-mark" aria-hidden="true">К</div>
+              <h1>Привет! Я Каспер.</h1>
+              <p>Помогу разобраться в сложной теме, придумать идею или написать текст. С чего начнём?</p>
+              <div class="suggestions" aria-label="Примеры вопросов">
+                <button class="suggestion" type="button">Объясни простыми словами, как работает искусственный интеллект</button>
+                <button class="suggestion" type="button">Помоги придумать идею для небольшого сайта</button>
+                <button class="suggestion" type="button">Составь короткий план подготовки к контрольной</button>
+                <button class="suggestion" type="button">Напиши дружелюбное описание для моего проекта</button>
+              </div>
+            </div>
+          </div>
+          <div class="composer-wrap">
+            <div class="model-toolbar">
+              <label class="model-picker" for="model-select">
+                <span>Модель</span>
+                <select id="model-select" aria-label="Выбрать ИИ-модель" disabled>
+                  <option value="koboldcpp/gemma-3-4b-it">Загружаю модели…</option>
+                </select>
+              </label>
+              <span class="model-status" id="model-status" role="status">Проверяю доступные модели…</span>
+            </div>
+            <form class="composer" id="chat-form">
+              <textarea id="prompt" rows="1" maxlength="2000" aria-label="Сообщение для Каспера" placeholder="Спроси о чём угодно..." required></textarea>
+              <button class="send" id="send" type="submit" aria-label="Отправить сообщение" disabled>
+                <svg id="send-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5m0 0L6.5 10.5M12 5l5.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg id="stop-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" hidden><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+              </button>
+            </form>
+            <div class="composer-meta"><span>Enter — отправить · Shift + Enter — новая строка</span><span id="char-count">0 / 2000</span></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <footer class="footer-note">
+      Ответы генерируют бесплатные модели сообщества, иногда они приходят не сразу. Не отправляй пароли, адрес или другие личные данные.
+      Диалоги сохраняются только в этом браузере.
+    </footer>
+  </div>
+  <script>
+    (() => {
+      const API = "https://aihorde.net/api/v2";
+      const MODEL = "koboldcpp/gemma-3-4b-it";
+      const MODEL_OPTIONS = [
+        { name: MODEL, label: "Gemma 3 4B · универсальная" },
+        { name: "koboldcpp/Llama-3.2-3B-Instruct-Q4_K_M", label: "Llama 3.2 3B · быстрая" },
+        { name: "google/gemma-4-31b", label: "Gemma 4 31B · мощная" },
+        { name: "koboldcpp/Llama-3.2-1B-Instruct", label: "Llama 3.2 1B · лёгкая" },
+        { name: "koboldcpp/Qwen2.5-Coder-3B-Instruct", label: "Qwen 2.5 Coder 3B · код" }
+      ];
+      const MAX_WAIT_MS = 120000;
+      const STORAGE_KEY = "kasper.chat-history.v1";
+      const CONTEXT_LIMIT = 4000;
+      const messagesEl = document.querySelector("#messages");
+      const welcome = document.querySelector("#welcome");
+      const form = document.querySelector("#chat-form");
+      const input = document.querySelector("#prompt");
+      const sendButton = document.querySelector("#send");
+      const sendIcon = document.querySelector("#send-icon");
+      const stopIcon = document.querySelector("#stop-icon");
+      const charCount = document.querySelector("#char-count");
+      const newChatButton = document.querySelector("#new-chat");
+      const sidebarNewChat = document.querySelector("#sidebar-new-chat");
+      const chatList = document.querySelector("#chat-list");
+      const storageNotice = document.querySelector("#storage-notice");
+      const workspace = document.querySelector("#workspace");
+      const toggleHistory = document.querySelector("#toggle-history");
+      const modelSelect = document.querySelector("#model-select");
+      const modelStatus = document.querySelector("#model-status");
+      let persistenceDisabled = false;
+      const state = loadState();
+      let activeRequest = null;
+      let requestToken = 0;
+      let modelsLoaded = false;
+
+      const backdropVideo = document.querySelector(".hero-photo");
+      const backdropSource = backdropVideo.querySelector("source");
+      const backdropMedia = window.matchMedia("(min-width: 641px) and (prefers-reduced-motion: no-preference)");
+
+      function updateBackdropVideo() {
+        const shouldPlay = backdropMedia.matches && !document.hidden && !navigator.connection?.saveData;
+        if (shouldPlay) {
+          if (!backdropSource.hasAttribute("src")) {
+            backdropSource.src = backdropSource.dataset.src;
+            backdropVideo.load();
+          }
+          const playback = backdropVideo.play();
+          if (playback) {
+            playback.catch(error => {
+              if (error.name !== "AbortError") console.warn("Не удалось запустить фоновое видео:", error);
+            });
+          }
+          return;
+        }
+        backdropVideo.pause();
+        if (!backdropMedia.matches && backdropSource.hasAttribute("src")) {
+          backdropSource.removeAttribute("src");
+          backdropVideo.load();
+        }
+      }
+
+      backdropMedia.addEventListener("change", updateBackdropVideo);
+      document.addEventListener("visibilitychange", updateBackdropVideo);
+      updateBackdropVideo();
+
+      function showStorageNotice(message) {
+        storageNotice.textContent = message;
+        storageNotice.hidden = !message;
+      }
+
+      function loadState() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) return { activeId: null, chats: [] };
+          const parsed = JSON.parse(saved);
+          if (!parsed || !Array.isArray(parsed.chats)) throw new Error("неверный формат истории");
+          const chats = parsed.chats
+            .filter(chat => chat && typeof chat.id === "string" && Array.isArray(chat.messages))
+            .map(chat => ({
+              id: chat.id,
+              title: typeof chat.title === "string" ? chat.title : "Новый чат",
+              model: typeof chat.model === "string" ? chat.model : MODEL,
+              createdAt: Number(chat.createdAt) || Date.now(),
+              updatedAt: Number(chat.updatedAt) || Date.now(),
+              messages: chat.messages
+                .filter(message => message && ["user", "assistant"].includes(message.role) && typeof message.text === "string")
+                .map(message => ({
+                  role: message.role,
+                  text: message.text,
+                  error: message.error === true
+                }))
+            }));
+          return {
+            activeId: chats.some(chat => chat.id === parsed.activeId) ? parsed.activeId : chats[0]?.id || null,
+            chats
+          };
+        } catch (error) {
+          persistenceDisabled = true;
+          showStorageNotice("Не удалось прочитать сохранённую историю. Старые диалоги не перезаписаны.");
+          console.error("Не удалось прочитать историю чатов:", error);
+          return { activeId: null, chats: [] };
+        }
+      }
+
+      function saveState() {
+        if (persistenceDisabled) return false;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ activeId: state.activeId, chats: state.chats }));
+          showStorageNotice("");
+          return true;
+        } catch (error) {
+          showStorageNotice("Не удалось сохранить историю в этом браузере. Освободи место в хранилище и попробуй снова.");
+          console.error("Не удалось сохранить историю чатов:", error);
+          return false;
+        }
+      }
+
+      function currentChat() {
+        return state.chats.find(chat => chat.id === state.activeId) || null;
+      }
+
+      function createChat() {
+        const now = Date.now();
+        const chat = {
+          id: crypto.randomUUID ? crypto.randomUUID() : `${now}-${Math.random().toString(36).slice(2)}`,
+          title: "Новый чат",
+          model: MODEL,
+          createdAt: now,
+          updatedAt: now,
+          messages: []
+        };
+        state.chats.unshift(chat);
+        state.activeId = chat.id;
+        return chat;
+      }
+
+      function updateComposer() {
+        input.style.height = "auto";
+        input.style.height = `${Math.min(input.scrollHeight, 180)}px`;
+        charCount.textContent = `${input.value.length} / 2000`;
+        sendButton.disabled = !activeRequest && !input.value.trim();
+      }
+
+      function addMessage(role, text, { error = false } = {}) {
+        const article = document.createElement("article");
+        article.className = `message message--${role}${error ? " message--error" : ""}`;
+        const avatar = document.createElement("span");
+        avatar.className = "message-avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        avatar.textContent = role === "user" ? "В" : "К";
+        const content = document.createElement("div");
+        content.className = "message-content";
+        const label = document.createElement("div");
+        label.className = "message-label";
+        label.textContent = role === "user" ? "Ты" : "Каспер";
+        const body = document.createElement("div");
+        body.className = "message-text";
+        body.textContent = text;
+        content.append(label, body);
+        article.append(avatar, content);
+        messagesEl.append(article);
+        return { article, body, content };
+      }
+
+      function renderChat() {
+        const chat = currentChat();
+        messagesEl.querySelectorAll(".message").forEach(message => message.remove());
+        welcome.hidden = Boolean(chat?.messages.length);
+        if (chat && modelsLoaded) {
+          if (![...modelSelect.options].some(option => option.value === chat.model)) {
+            chat.model = MODEL;
+            saveState();
+          }
+          modelSelect.value = chat.model;
+        }
+        if (chat) {
+          chat.messages.forEach(message => addMessage(message.role, message.text, { error: message.error }));
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        renderChatList();
+        updateComposer();
+      }
+
+      function renderChatList() {
+        chatList.replaceChildren();
+        const sortedChats = [...state.chats].sort((first, second) => second.updatedAt - first.updatedAt);
+        if (sortedChats.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "sidebar-empty";
+          empty.textContent = "Здесь будут сохранённые диалоги.";
+          chatList.append(empty);
+          return;
+        }
+        sortedChats.forEach(chat => {
+          const row = document.createElement("div");
+          row.className = "chat-row";
+          row.setAttribute("role", "listitem");
+          const select = document.createElement("button");
+          select.className = "chat-select";
+          select.type = "button";
+          select.setAttribute("aria-current", String(chat.id === state.activeId));
+          const title = document.createElement("span");
+          title.className = "chat-title";
+          title.textContent = chat.title || "Новый чат";
+          const preview = document.createElement("span");
+          preview.className = "chat-preview";
+          preview.textContent = chat.messages.at(-1)?.text || "Пока без сообщений";
+          select.append(title, preview);
+          select.addEventListener("click", () => selectChat(chat.id));
+          const remove = document.createElement("button");
+          remove.className = "chat-delete";
+          remove.type = "button";
+          remove.setAttribute("aria-label", `Удалить чат «${chat.title || "Новый чат"}»`);
+          remove.title = "Удалить чат";
+          remove.innerHTML = '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 6h12m-10 0 .7 10h6.6L14 6m-6-2h4m-3 5v4m2-4v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          remove.addEventListener("click", () => deleteChat(chat.id));
+          row.append(select, remove);
+          chatList.append(row);
+        });
+      }
+
+      function selectChat(id) {
+        if (!state.chats.some(chat => chat.id === id)) return;
+        if (activeRequest) stopActiveRequest();
+        state.activeId = id;
+        saveState();
+        renderChat();
+        workspace.classList.remove("history-open");
+        toggleHistory.setAttribute("aria-expanded", "false");
+        toggleHistory.setAttribute("aria-label", "Показать чаты");
+        input.focus();
+      }
+
+      function deleteChat(id) {
+        if (activeRequest?.chatId === id) stopActiveRequest();
+        state.chats = state.chats.filter(chat => chat.id !== id);
+        if (state.activeId === id) state.activeId = state.chats[0]?.id || null;
+        if (!state.activeId) createChat();
+        saveState();
+        renderChat();
+      }
+
+      function startNewChat() {
+        if (activeRequest) stopActiveRequest();
+        if (currentChat()?.messages.length === 0) {
+          workspace.classList.remove("history-open");
+          toggleHistory.setAttribute("aria-expanded", "false");
+          toggleHistory.setAttribute("aria-label", "Показать чаты");
+          input.focus();
+          return;
+        }
+        createChat();
+        saveState();
+        renderChat();
+        workspace.classList.remove("history-open");
+        toggleHistory.setAttribute("aria-expanded", "false");
+        toggleHistory.setAttribute("aria-label", "Показать чаты");
+        input.focus();
+      }
+
+      function setBusy(busy) {
+        input.disabled = busy;
+        modelSelect.disabled = busy || modelSelect.options.length < 2;
+        sendButton.setAttribute("aria-label", busy ? "Остановить ответ" : "Отправить сообщение");
+        sendIcon.hidden = busy;
+        stopIcon.hidden = !busy;
+        sendButton.title = busy ? "Остановить ответ" : "";
+        updateComposer();
+      }
+
+      function stopActiveRequest() {
+        if (!activeRequest) return;
+        const request = activeRequest;
+        requestToken++;
+        activeRequest = null;
+        request.controller.abort();
+        const chat = state.chats.find(item => item.id === request.chatId);
+        if (chat) {
+          chat.messages.push({ role: "assistant", text: "Ответ остановлен." });
+          chat.updatedAt = Date.now();
+        }
+        request.body.textContent = "Ответ остановлен.";
+        request.statusEl.remove();
+        request.article.classList.remove("message--pending");
+        saveState();
+        renderChatList();
+        setBusy(false);
+      }
+
+      function wait(ms, signal) {
+        return new Promise((resolve, reject) => {
+          if (signal.aborted) {
+            reject(new DOMException("Запрос остановлен", "AbortError"));
+            return;
+          }
+          const onAbort = () => {
+            clearTimeout(timer);
+            reject(new DOMException("Запрос остановлен", "AbortError"));
+          };
+          const timer = setTimeout(() => {
+            signal.removeEventListener("abort", onAbort);
+            resolve();
+          }, ms);
+          signal.addEventListener("abort", onAbort, { once: true });
+        });
+      }
+
+      function responseError(data, status) {
+        const detail = data?.message || Object.values(data?.errors || {}).flat().join(" ");
+        if (status === 401 || status === 403) return "Бесплатный сервис временно ограничил анонимные запросы. Попробуй позже.";
+        if (status === 429) return "Слишком много запросов к бесплатной очереди. Подожди немного и попробуй снова.";
+        if (status === 503) return "Сейчас нет свободных ИИ-моделей. Попробуй отправить сообщение позже.";
+        return detail ? `Сервис не принял запрос: ${detail}` : `Сервис ответил с ошибкой (${status}). Попробуй позже.`;
+      }
+
+      function makePrompt(chat) {
+        const dialogue = chat.messages.filter(message => !message.error);
+        const latest = dialogue.at(-1);
+        const previous = [];
+        let contextLength = 0;
+        for (let index = dialogue.length - 2; index >= 0; index--) {
+          const message = dialogue[index];
+          const text = message.text.slice(-1200);
+          const line = `${message.role === "user" ? "Пользователь" : "Каспер"}: ${text}`;
+          if (contextLength + line.length > CONTEXT_LIMIT) break;
+          previous.unshift(line);
+          contextLength += line.length;
+        }
+        return [
+          "Ты — Каспер, доброжелательный и внимательный помощник.",
+          "Отвечай на языке пользователя, обычно на русском. Пиши ясно и по делу. Если не уверен, честно скажи об этом. Не выдумывай факты и не проси личные данные.",
+          "Напиши только один готовый ответ на последний вопрос. Не показывай внутренние рассуждения, анализ или планы. Не продолжай диалог и не придумывай реплики пользователя.",
+          previous.length ? `Контекст предыдущей переписки:\n${previous.join("\n")}` : "",
+          `Последний вопрос пользователя: ${latest.text}`,
+          "Ответ:"
+        ].filter(Boolean).join("\n");
+      }
+
+      async function generate(chat, signal, setStatus) {
+        const payload = {
+          prompt: makePrompt(chat),
+          params: { max_length: 320, max_context_length: 4096, temperature: 0.65, top_p: 0.9 },
+          models: [chat.model || MODEL]
+        };
+        const startResponse = await fetch(`${API}/generate/text/async`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": "0000000000",
+            "Client-Agent": "KasperAI:1.0.0:portfolio-demo"
+          },
+          body: JSON.stringify(payload),
+          signal
+        });
+        const startData = await startResponse.json().catch(() => ({}));
+        if (!startResponse.ok) throw new Error(responseError(startData, startResponse.status));
+        if (!startData.id) throw new Error("Сервис не выдал номер запроса. Попробуй ещё раз.");
+
+        const deadline = Date.now() + MAX_WAIT_MS;
+        while (Date.now() < deadline) {
+          await wait(1800, signal);
+          const statusResponse = await fetch(`${API}/generate/text/status/${encodeURIComponent(startData.id)}`, {
+            headers: { "Client-Agent": "KasperAI:1.0.0:portfolio-demo" },
+            signal
+          });
+          const statusData = await statusResponse.json().catch(() => ({}));
+          if (!statusResponse.ok) throw new Error(responseError(statusData, statusResponse.status));
+          if (statusData.faulted) throw new Error("Модель не смогла обработать запрос. Попробуй повторить его.");
+          if (statusData.is_possible === false) throw new Error("Сейчас нет доступной модели. Попробуй позже.");
+          if (statusData.done) {
+            const answer = statusData.generations?.[0]?.text?.trim();
+            if (!answer) throw new Error("Модель вернула пустой ответ. Попробуй задать вопрос иначе.");
+            return answer;
+          }
+          if (typeof statusData.queue_position === "number" && statusData.queue_position > 0) {
+            setStatus(`Бесплатная очередь · место ${statusData.queue_position}`);
+          } else {
+            setStatus("Каспер готовит ответ…");
+          }
+        }
+        throw new Error("Ответ задерживается. Останови запрос и попробуй позже — в бесплатной очереди бывает ожидание.");
+      }
+
+      async function loadModels() {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(`${API}/status/models?type=text`, {
+            headers: { "Client-Agent": "KasperAI:1.0.0:portfolio-demo" },
+            signal: controller.signal
+          });
+          if (!response.ok) throw new Error(`Сервис вернул ошибку (${response.status})`);
+          const availableModels = await response.json();
+          if (!Array.isArray(availableModels)) throw new Error("Сервис вернул неверный список моделей");
+          const byName = new Map(
+            availableModels
+              .filter(model => model && typeof model.name === "string" && Number(model.count) > 0)
+              .map(model => [model.name, model])
+          );
+          const choices = MODEL_OPTIONS.filter(option => byName.has(option.name));
+          if (!choices.length) {
+            modelSelect.replaceChildren(new Option("Стандартная модель", MODEL));
+            modelsLoaded = true;
+            modelSelect.disabled = false;
+            modelStatus.textContent = "Сейчас нет доступных моделей";
+            renderChat();
+            return;
+          }
+          modelSelect.replaceChildren(
+            ...choices.map(option => {
+              const model = byName.get(option.name);
+              return new Option(`${option.label} · ${model.count} онлайн`, option.name);
+            })
+          );
+          modelsLoaded = true;
+          modelSelect.disabled = false;
+          const chat = currentChat();
+          if (chat && !byName.has(chat.model)) {
+            chat.model = choices.some(option => option.name === MODEL) ? MODEL : choices[0].name;
+            saveState();
+          }
+          modelStatus.textContent = `Доступно моделей: ${choices.length}`;
+          renderChat();
+        } catch (error) {
+          modelSelect.replaceChildren(new Option("Gemma 3 4B · стандартная", MODEL));
+          modelsLoaded = true;
+          modelSelect.disabled = false;
+          modelStatus.textContent = "Не удалось обновить список — выбрана стандартная модель";
+          console.error("Не удалось загрузить список ИИ-моделей:", error);
+          renderChat();
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
+
+      async function sendMessage(text) {
+        const question = text.trim();
+        if (!question || activeRequest) return;
+        const chat = currentChat();
+        if (!chat) return;
+        const token = ++requestToken;
+        const controller = new AbortController();
+        chat.messages.push({ role: "user", text: question });
+        if (chat.title === "Новый чат") chat.title = question.length > 42 ? `${question.slice(0, 42).trimEnd()}…` : question;
+        chat.updatedAt = Date.now();
+        saveState();
+        addMessage("user", question);
+        input.value = "";
+        updateComposer();
+        const { article, body, content } = addMessage("assistant", "");
+        article.classList.add("message--pending");
+        const dots = document.createElement("span");
+        dots.className = "thinking";
+        dots.setAttribute("aria-label", "Каспер готовит ответ");
+        dots.innerHTML = "<span></span><span></span><span></span>";
+        body.append(dots);
+        const statusEl = document.createElement("div");
+        statusEl.className = "message-status";
+        statusEl.textContent = "Подключаю бесплатную модель…";
+        content.append(statusEl);
+        activeRequest = { token, controller, chatId: chat.id, article, body, statusEl };
+        renderChatList();
+        setBusy(true);
+
+        try {
+          const answer = await generate(chat, controller.signal, status => { statusEl.textContent = status; });
+          if (token !== requestToken || activeRequest?.token !== token) return;
+          chat.messages.push({ role: "assistant", text: answer });
+          chat.updatedAt = Date.now();
+          saveState();
+          body.textContent = answer;
+          statusEl.remove();
+          article.classList.remove("message--pending");
+        } catch (error) {
+          if (token !== requestToken || activeRequest?.token !== token) return;
+          const message = error.name === "AbortError"
+            ? "Ответ остановлен."
+            : error instanceof TypeError
+              ? "Не удалось подключиться к бесплатному ИИ-сервису. Проверь интернет-соединение и попробуй ещё раз."
+              : error.message || "Не удалось получить ответ. Попробуй ещё раз.";
+          chat.messages.push({ role: "assistant", text: message, error: error.name !== "AbortError" });
+          chat.updatedAt = Date.now();
+          saveState();
+          if (error.name === "AbortError") {
+            body.textContent = message;
+          } else {
+            body.textContent = message;
+            article.classList.add("message--error");
+          }
+          statusEl.remove();
+          article.classList.remove("message--pending");
+        } finally {
+          if (token === requestToken && activeRequest?.token === token) {
+            activeRequest = null;
+            setBusy(false);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            renderChatList();
+          }
+        }
+      }
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        if (activeRequest) return stopActiveRequest();
+        sendMessage(input.value);
+      });
+      input.addEventListener("input", updateComposer);
+      modelSelect.addEventListener("change", () => {
+        const chat = currentChat();
+        if (!chat || !modelSelect.value) return;
+        chat.model = modelSelect.value;
+        saveState();
+      });
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+      document.querySelectorAll(".suggestion").forEach(button => {
+        button.addEventListener("click", () => sendMessage(button.textContent));
+      });
+      newChatButton.addEventListener("click", startNewChat);
+      sidebarNewChat.addEventListener("click", startNewChat);
+      toggleHistory.addEventListener("click", () => {
+        const open = !workspace.classList.contains("history-open");
+        workspace.classList.toggle("history-open", open);
+        toggleHistory.setAttribute("aria-expanded", String(open));
+        toggleHistory.setAttribute("aria-label", open ? "Скрыть чаты" : "Показать чаты");
+      });
+      document.querySelector(".main").addEventListener("click", () => {
+        if (!workspace.classList.contains("history-open")) return;
+        workspace.classList.remove("history-open");
+        toggleHistory.setAttribute("aria-expanded", "false");
+        toggleHistory.setAttribute("aria-label", "Показать чаты");
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && workspace.classList.contains("history-open")) {
+          workspace.classList.remove("history-open");
+          toggleHistory.setAttribute("aria-expanded", "false");
+          toggleHistory.setAttribute("aria-label", "Показать чаты");
+          toggleHistory.focus();
+        }
+      });
+      window.addEventListener("storage", event => {
+        if (event.key !== STORAGE_KEY) return;
+        const updated = loadState();
+        state.chats = updated.chats;
+        state.activeId = updated.activeId;
+        if (!currentChat()) createChat();
+        saveState();
+        renderChat();
+      });
+      if (!currentChat()) createChat();
+      saveState();
+      renderChat();
+      updateComposer();
+      loadModels();
+    })();
+  </script>
+</body>
+</html>
