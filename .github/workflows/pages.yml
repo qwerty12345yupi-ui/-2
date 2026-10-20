@@ -1,0 +1,49 @@
+name: Publish portfolio pages
+
+on:
+  push:
+    branches:
+      - portfolio-pages
+    paths:
+      - ".github/workflows/pages.yml"
+      - "index.html"
+      - "pizza-test.html"
+      - "kasper.html"
+      - "kasper-chat.html"
+      - "assets/pizzas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Prepare static site
+        run: |
+          mkdir -p _site/assets
+          cp index.html pizza-test.html kasper.html kasper-chat.html _site/
+          cp -R assets/pizzas _site/assets/
+          touch _site/.nojekyll
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
